@@ -1,146 +1,133 @@
 /* ============================================
-   Voice Chatbot - Estilo ChatGPT
+   Voice Chatbot - Interfaz de Llamada
    ============================================ */
 
 :root {
   --primary-color: #10a37f;
   --primary-hover: #0d8f6f;
   --danger-color: #ef4444;
-  --bg-light: #f7f7f8;
-  --bg-dark: #ffffff;
-  --text-primary: #353740;
-  --text-secondary: #6e6e80;
-  --border-color: #e5e5e5;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --bg-gradient-start: #667eea;
+  --bg-gradient-end: #764ba2;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 #voice-chatbot-container {
-  max-width: 600px;
+  max-width: 400px;
   margin: 2rem auto;
-  padding: 2rem;
-  background: var(--bg-dark);
-  border-radius: 20px;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  border-radius: 30px;
   box-shadow: var(--shadow-lg);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  text-align: center;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fondo animado */
+#voice-chatbot-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ============================================
-   Área de mensajes del chat
+   Avatar del Asistente
    ============================================ */
 
-#chat-messages {
-  min-height: 300px;
-  max-height: 500px;
-  overflow-y: auto;
+#assistant-avatar {
+  position: relative;
+  z-index: 1;
   margin-bottom: 2rem;
-  padding: 1rem;
-  background: var(--bg-light);
-  border-radius: 16px;
-  scroll-behavior: smooth;
 }
 
-#chat-messages::-webkit-scrollbar {
-  width: 6px;
-}
-
-#chat-messages::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-#chat-messages::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 10px;
-}
-
-#chat-messages::-webkit-scrollbar-thumb:hover {
-  background: #c0c0c0;
-}
-
-.chat-message {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  border-radius: 12px;
-  animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.chat-message.user {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  margin-left: auto;
-  flex-direction: row-reverse;
-}
-
-.chat-message.bot {
-  background: white;
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-}
-
-.message-icon {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+.avatar-circle {
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  margin: 0 auto 1rem;
+  backdrop-filter: blur(10px);
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
 
-.chat-message.bot .message-icon {
-  background: var(--primary-color);
-  color: white;
+.avatar-circle svg {
+  color: var(--text-primary);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-.message-content {
-  flex: 1;
-  font-size: 0.95rem;
-  line-height: 1.5;
+.avatar-name {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-.message-time {
-  font-size: 0.75rem;
-  opacity: 0.6;
-  margin-top: 0.25rem;
-  white-space: nowrap;
+/* Animaciones del avatar segun estado */
+#voice-chatbot-container.listening .avatar-circle,
+#voice-chatbot-container.speaking .avatar-circle {
+  animation: avatarPulse 1.5s ease-in-out infinite;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes avatarPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 15px 50px rgba(255, 255, 255, 0.3);
+  }
+}
+
+#voice-chatbot-container.processing .avatar-circle {
+  animation: avatarRotate 2s linear infinite;
+}
+
+@keyframes avatarRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ============================================
-   Controles de voz
+   Estado de la llamada
    ============================================ */
 
-#voice-controls {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  background: var(--bg-light);
-  border-radius: 16px;
+#call-status {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
 }
 
-/* Indicador de estado */
 #status-indicator {
   position: relative;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto 1rem;
 }
 
 .status-dot {
@@ -148,9 +135,9 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 12px;
-  height: 12px;
-  background: #9ca3af;
+  width: 16px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   transition: all 0.3s ease;
 }
@@ -160,31 +147,28 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--primary-color);
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
   border-radius: 50%;
   opacity: 0;
 }
 
 /* Estados del indicador */
-#status-indicator.listening .status-dot {
-  background: var(--primary-color);
+#status-indicator.listening .status-dot,
+#status-indicator.speaking .status-dot {
+  background: var(--text-primary);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-#status-indicator.listening .pulse-ring {
+#status-indicator.listening .pulse-ring,
+#status-indicator.speaking .pulse-ring {
   animation: pulseRing 1.5s ease-in-out infinite;
 }
 
 #status-indicator.processing .status-dot {
-  background: #f59e0b;
+  background: var(--text-primary);
   animation: blink 1s ease-in-out infinite;
-}
-
-#status-indicator.speaking .status-dot {
-  background: #3b82f6;
-  animation: pulse 1s ease-in-out infinite;
 }
 
 @keyframes pulse {
@@ -202,11 +186,11 @@
     transform: translate(-50%, -50%) scale(0.8);
   }
   50% {
-    opacity: 0.6;
+    opacity: 0.8;
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.8);
+    transform: translate(-50%, -50%) scale(2);
   }
 }
 
@@ -217,24 +201,48 @@
 
 /* Texto de estado */
 #status-text {
-  flex: 1;
+  color: var(--text-primary);
 }
 
 .main-status {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .sub-status {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--text-secondary);
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* ============================================
-   Botón de voz
+   Temporizador de llamada
    ============================================ */
+
+#call-timer {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
+}
+
+#timer-display {
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--text-primary);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================
+   Boton de llamada
+   ============================================ */
+
+#call-button-container {
+  position: relative;
+  z-index: 1;
+}
 
 #voice-btn {
   width: 80px;
@@ -246,111 +254,94 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  position: relative;
-  background: var(--primary-color);
-  color: white;
-  box-shadow: var(--shadow-md);
-  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--primary-color);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  margin: 0 auto 1rem;
 }
 
 #voice-btn:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow-lg);
+  transform: scale(1.1);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
 }
 
 #voice-btn:active {
   transform: scale(0.95);
 }
 
-#voice-btn::before {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  padding: 4px;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.button-label {
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Iconos del botón */
+/* Iconos del boton */
 .mic-icon,
-.stop-icon {
+.phone-icon {
   transition: all 0.3s ease;
 }
 
-#voice-btn.ready .stop-icon,
-#voice-btn.processing .stop-icon,
-#voice-btn.speaking .mic-icon {
-  display: none;
-}
-
-#voice-btn.listening .mic-icon {
-  display: none;
-}
-
-/* Estados del botón */
+/* Estado inicial: mostrar telefono verde */
 #voice-btn.ready {
-  background: var(--primary-color);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--primary-color);
 }
 
-#voice-btn.ready:hover::before {
-  opacity: 1;
+#voice-btn.ready .phone-icon {
+  display: none;
 }
 
-#voice-btn.listening {
+#voice-btn.ready .mic-icon {
+  display: block;
+}
+
+/* Cuando la llamada esta activa: mostrar telefono rojo */
+#voice-btn.call-active {
   background: var(--danger-color);
-  animation: recordPulse 1.5s ease-in-out infinite;
+  color: white;
+  animation: callActivePulse 2s ease-in-out infinite;
 }
 
-@keyframes recordPulse {
+@keyframes callActivePulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+    box-shadow: 0 10px 40px rgba(239, 68, 68, 0.6);
   }
 }
 
+#voice-btn.call-active .mic-icon {
+  display: none;
+}
+
+#voice-btn.call-active .phone-icon {
+  display: block;
+}
+
+#voice-btn.call-active + .button-label {
+  content: 'Colgar';
+}
+
+/* Estado escuchando */
+#voice-btn.listening {
+  background: var(--danger-color);
+  color: white;
+}
+
+/* Estado procesando */
 #voice-btn.processing {
   background: #f59e0b;
+  color: white;
   cursor: not-allowed;
   animation: rotate 2s linear infinite;
 }
 
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
+/* Estado hablando */
 #voice-btn.speaking {
   background: #3b82f6;
-  animation: speakPulse 1s ease-in-out infinite;
-}
-
-@keyframes speakPulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
-  }
-}
-
-/* ============================================
-   Estados del contenedor
-   ============================================ */
-
-#voice-chatbot-container.listening {
-  border: 2px solid var(--primary-color);
-}
-
-#voice-chatbot-container.speaking {
-  border: 2px solid #3b82f6;
+  color: white;
 }
 
 /* ============================================
@@ -360,69 +351,64 @@
 @media (max-width: 640px) {
   #voice-chatbot-container {
     margin: 1rem;
-    padding: 1.5rem;
-    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+    min-height: 450px;
   }
 
-  #chat-messages {
-    min-height: 200px;
-    max-height: 300px;
+  .avatar-circle {
+    width: 100px;
+    height: 100px;
   }
 
-  #voice-controls {
-    gap: 1rem;
-    padding: 1rem;
+  .avatar-circle svg {
+    width: 40px;
+    height: 40px;
   }
 
-  #voice-btn {
-    width: 64px;
-    height: 64px;
+  .avatar-name {
+    font-size: 1.3rem;
   }
 
   .main-status {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
   .sub-status {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
 
-  .chat-message {
-    padding: 0.75rem;
+  #timer-display {
+    font-size: 1.6rem;
   }
 
-  .message-content {
-    font-size: 0.875rem;
+  #voice-btn {
+    width: 70px;
+    height: 70px;
+  }
+
+  .mic-icon,
+  .phone-icon {
+    width: 35px;
+    height: 35px;
   }
 }
 
 /* ============================================
-   Animaciones adicionales
+   Animacion de entrada
    ============================================ */
 
 @keyframes fadeIn {
   from {
     opacity: 0;
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
 #voice-chatbot-container {
   animation: fadeIn 0.5s ease;
-}
-
-/* Mejora visual cuando no hay mensajes */
-#chat-messages:empty::before {
-  content: "👋 ¡Hola! Presiona el botón y comienza a hablar con tu asistente de voz.";
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 2rem;
-  font-size: 1.1rem;
-  line-height: 1.6;
 }

@@ -109,10 +109,32 @@ function voice_chatbot_settings_page() {
   "user_id": ID_del_usuario_o_0_si_no_logueado
 }</pre>
       
-      <h3>📝 Ejemplo de respuesta esperada de n8n:</h3>
-      <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">{
-  "audioUrl": "https://tu-servidor.com/ruta/al/archivo.mp3"
-}</pre>
+      <h3>📝 Respuesta esperada de n8n:</h3>
+      <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">El webhook debe devolver el archivo MP3 directamente (binario)
+Content-Type: audio/mpeg
+
+NO devolver JSON, sino el archivo de audio directo.</pre>
+      
+      <h3>🔄 Flujo de Conversación (Modo Llamada):</h3>
+      <ol>
+        <li><strong>Activar:</strong> Usuario presiona botón para iniciar modo llamada</li>
+        <li><strong>Detección automática:</strong> El sistema detecta cuando hablas</li>
+        <li><strong>Grabación automática:</strong> Graba mientras hablas, se detiene con el silencio</li>
+        <li><strong>Procesamiento:</strong> Envía a n8n automáticamente (NO puede hablar)</li>
+        <li><strong>Respuesta:</strong> Reproduce el audio (puede interrumpir hablando encima)</li>
+        <li><strong>Continúa:</strong> Vuelve a escuchar automáticamente</li>
+      </ol>
+      
+      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin-top: 15px;">
+        <strong>⚠️ Importante:</strong>
+        <ul style="margin: 10px 0 0 20px;">
+          <li>El sistema detecta tu voz automáticamente (como ChatGPT en modo llamada)</li>
+          <li>Se detiene automáticamente después de 1.5 segundos de silencio</li>
+          <li>Durante el procesamiento NO puedes hablar</li>
+          <li>Durante la respuesta puedes interrumpir hablando encima</li>
+          <li>El webhook debe devolver el archivo MP3 directamente (binario), NO un JSON</li>
+        </ul>
+      </div>
     </div>
   </div>
   <?php
@@ -169,11 +191,22 @@ add_action('wp_enqueue_scripts', function() {
   // Obtener configuración desde la base de datos
   $webhook_url = get_option('voice_chatbot_webhook_url', '');
   $jwt_token = voice_chatbot_generate_jwt();
+  
+  // Generar session_id único por usuario
+  $current_user_id = get_current_user_id();
+  $session_id = '';
+  
+  if ($current_user_id > 0) {
+    // Usuario logueado: usar su ID de WordPress
+    $session_id = 'wp_user_' . $current_user_id;
+  }
+  // Si no está logueado, JavaScript generará uno en el navegador
 
   // Pasar configuración a JavaScript
   wp_localize_script('voice-chatbot-js', 'voiceChatbotConfig', [
     'webhookUrl' => $webhook_url,
     'jwtToken' => $jwt_token,
+    'sessionId' => $session_id,
     'hasConfig' => !empty($webhook_url) && !empty(get_option('voice_chatbot_jwt_secret', ''))
   ]);
 });
@@ -183,30 +216,47 @@ add_shortcode('voice_chatbot', function() {
   ob_start();
   ?>
   <div id="voice-chatbot-container">
-    <div id="chat-messages"></div>
     
-    <div id="voice-controls">
+    <!-- Avatar del asistente -->
+    <div id="assistant-avatar">
+      <div class="avatar-circle">
+        <svg viewBox="0 0 24 24" width="48" height="48">
+          <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+        </svg>
+      </div>
+      <div class="avatar-name">Asistente Virtual</div>
+    </div>
+
+    <!-- Indicador de estado visual -->
+    <div id="call-status">
       <div id="status-indicator">
         <div class="pulse-ring"></div>
         <div class="status-dot"></div>
       </div>
-      
       <div id="status-text">
-        <div class="main-status">Listo para escuchar</div>
-        <div class="sub-status">Presiona el botón para hablar</div>
+        <div class="main-status">Presiona para llamar</div>
+        <div class="sub-status">Llamada de voz</div>
       </div>
-      
+    </div>
+
+    <!-- Tiempo de llamada -->
+    <div id="call-timer" style="display: none;">
+      <span id="timer-display">00:00</span>
+    </div>
+
+    <!-- Boton de llamada grande -->
+    <div id="call-button-container">
       <button id="voice-btn" class="ready">
-        <svg class="mic-icon" viewBox="0 0 24 24" width="32" height="32">
-          <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-          <path fill="currentColor" d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        <svg class="mic-icon" viewBox="0 0 24 24" width="40" height="40">
+          <path fill="currentColor" d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
         </svg>
-        <svg class="stop-icon" viewBox="0 0 24 24" width="32" height="32">
-          <rect x="6" y="6" width="12" height="12" fill="currentColor"/>
+        <svg class="phone-icon" viewBox="0 0 24 24" width="40" height="40" style="display: none;">
+          <path fill="currentColor" d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.68-1.36-2.66-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
         </svg>
       </button>
+      <div class="button-label">Llamar</div>
     </div>
-    
+
     <audio id="bot-audio" hidden></audio>
   </div>
   <?php

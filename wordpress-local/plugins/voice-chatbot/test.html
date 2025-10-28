@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎙️ Voice Chatbot - Test</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px;">
+  
+  <div style="max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 20px; margin-bottom: 20px;">
+    <h1 style="text-align: center; color: #353740; margin-bottom: 10px;">🎙️ Voice Chatbot Test</h1>
+    <p style="text-align: center; color: #6e6e80; margin-bottom: 30px;">
+      Página de prueba para el plugin de WordPress
+    </p>
+    
+    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+      <strong>⚙️ Configuración de Prueba:</strong>
+      <ul style="margin: 10px 0 0 20px;">
+        <li>Usa un webhook de prueba o mockea la respuesta</li>
+        <li>Genera un JWT válido o usa el de ejemplo</li>
+        <li>Asegúrate de tener HTTPS para acceder al micrófono</li>
+      </ul>
+    </div>
+
+    <div style="background: #f7f7f8; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+      <label style="display: block; font-weight: 600; margin-bottom: 8px;">🔗 Webhook URL:</label>
+      <input type="url" id="test-webhook-url" 
+             placeholder="https://tu-n8n.com/webhook/voice-chat"
+             style="width: 100%; padding: 10px; border: 1px solid #e5e5e5; border-radius: 8px; font-size: 14px;">
+      
+      <label style="display: block; font-weight: 600; margin-top: 15px; margin-bottom: 8px;">🔑 JWT Token:</label>
+      <input type="text" id="test-jwt-token" 
+             placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+             style="width: 100%; padding: 10px; border: 1px solid #e5e5e5; border-radius: 8px; font-size: 14px;">
+      
+      <label style="display: flex; align-items: center; margin-top: 15px; cursor: pointer;">
+        <input type="checkbox" id="test-mock-mode" style="margin-right: 8px;">
+        <span>🧪 Modo de prueba (usar respuesta simulada sin llamar al webhook)</span>
+      </label>
+      
+      <button onclick="saveTestConfig()" 
+              style="margin-top: 15px; padding: 10px 20px; background: #10a37f; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+        💾 Guardar Configuración
+      </button>
+    </div>
+
+    <div style="background: #e0f2fe; border-left: 4px solid #3b82f6; padding: 15px; border-radius: 8px;">
+      <strong>ℹ️ Estados del Sistema:</strong>
+      <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+        <li><span style="color: #10a37f;">🟢 READY</span> - Listo para grabar</li>
+        <li><span style="color: #10a37f;">🎤 LISTENING</span> - Grabando (interrumpible)</li>
+        <li><span style="color: #f59e0b;">⏳ PROCESSING</span> - Enviando a n8n (NO interrumpible)</li>
+        <li><span style="color: #3b82f6;">🔊 SPEAKING</span> - Reproduciendo respuesta (interrumpible)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- VOICE CHATBOT COMPONENT -->
+  <div id="voice-chatbot-container">
+    <div id="chat-messages"></div>
+    
+    <div id="voice-controls">
+      <div id="status-indicator">
+        <div class="pulse-ring"></div>
+        <div class="status-dot"></div>
+      </div>
+      
+      <div id="status-text">
+        <div class="main-status">Listo para escuchar</div>
+        <div class="sub-status">Presiona el botón para hablar</div>
+      </div>
+      
+      <button id="voice-btn" class="ready">
+        <svg class="mic-icon" viewBox="0 0 24 24" width="32" height="32">
+          <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+          <path fill="currentColor" d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        </svg>
+        <svg class="stop-icon" viewBox="0 0 24 24" width="32" height="32">
+          <rect x="6" y="6" width="12" height="12" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+    
+    <audio id="bot-audio" hidden></audio>
+  </div>
+
+  <!-- SCRIPT CONFIGURATION -->
+  <script>
+    // Configuración para el test
+    window.voiceChatbotConfig = {
+      webhookUrl: localStorage.getItem('test-webhook-url') || '',
+      jwtToken: localStorage.getItem('test-jwt-token') || 'test-token',
+      hasConfig: true,
+      mockMode: localStorage.getItem('test-mock-mode') === 'true'
+    };
+
+    // Cargar valores guardados
+    document.getElementById('test-webhook-url').value = voiceChatbotConfig.webhookUrl;
+    document.getElementById('test-jwt-token').value = voiceChatbotConfig.jwtToken;
+    document.getElementById('test-mock-mode').checked = voiceChatbotConfig.mockMode;
+
+    function saveTestConfig() {
+      const webhookUrl = document.getElementById('test-webhook-url').value;
+      const jwtToken = document.getElementById('test-jwt-token').value;
+      const mockMode = document.getElementById('test-mock-mode').checked;
+
+      localStorage.setItem('test-webhook-url', webhookUrl);
+      localStorage.setItem('test-jwt-token', jwtToken);
+      localStorage.setItem('test-mock-mode', mockMode);
+
+      voiceChatbotConfig.webhookUrl = webhookUrl;
+      voiceChatbotConfig.jwtToken = jwtToken;
+      voiceChatbotConfig.mockMode = mockMode;
+
+      alert('✅ Configuración guardada. Recarga la página para aplicar los cambios.');
+    }
+
+    // Función de ayuda para generar JWT de prueba
+    function generateTestJWT() {
+      const header = btoa(JSON.stringify({ typ: 'JWT', alg: 'HS256' }));
+      const payload = btoa(JSON.stringify({
+        iss: window.location.origin,
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + 300,
+        user_id: 1
+      }));
+      return `${header}.${payload}.test-signature`;
+    }
+
+    // Si no hay token, generar uno de prueba
+    if (!voiceChatbotConfig.jwtToken || voiceChatbotConfig.jwtToken === 'test-token') {
+      voiceChatbotConfig.jwtToken = generateTestJWT();
+      document.getElementById('test-jwt-token').value = voiceChatbotConfig.jwtToken;
+    }
+  </script>
+
+  <!-- VOICE CHATBOT SCRIPT (modificado para pruebas) -->
+  <script>
+    (function() {
+      'use strict';
+
+      // ============================================
+      // Estado de la aplicación
+      // ============================================
+      
+      const STATE = {
+        READY: 'ready',
+        LISTENING: 'listening',
+        PROCESSING: 'processing',
+        SPEAKING: 'speaking'
+      };
+
+      let currentState = STATE.READY;
+      let mediaRecorder = null;
+      let audioChunks = [];
+      let audioElement = null;
+      let canInterrupt = false;
+
+      // ============================================
+      // Elementos del DOM
+      // ============================================
+      
+      const voiceBtn = document.getElementById('voice-btn');
+      const statusIndicator = document.getElementById('status-indicator');
+      const mainStatus = document.querySelector('.main-status');
+      const subStatus = document.querySelector('.sub-status');
+      const chatMessages = document.getElementById('chat-messages');
+      const container = document.getElementById('voice-chatbot-container');
+      
+      audioElement = document.getElementById('bot-audio');
+
+      // ============================================
+      // Validar configuración
+      // ============================================
+      
+      if (!voiceChatbotConfig.hasConfig) {
+        updateStatus('❌ Plugin no configurado', 'Configura el webhook arriba');
+        voiceBtn.disabled = true;
+        voiceBtn.style.opacity = '0.5';
+        voiceBtn.style.cursor = 'not-allowed';
+        return;
+      }
+
+      // ============================================
+      // Manejador del botón principal
+      // ============================================
+      
+      voiceBtn.addEventListener('click', handleButtonClick);
+
+      function handleButtonClick() {
+        switch (currentState) {
+          case STATE.READY:
+            startRecording();
+            break;
+          
+          case STATE.LISTENING:
+            stopRecording();
+            break;
+          
+          case STATE.PROCESSING:
+            showTemporaryMessage('⏳ Espera la respuesta del asistente...');
+            break;
+          
+          case STATE.SPEAKING:
+            if (canInterrupt) {
+              stopSpeaking();
+            }
+            break;
+        }
+      }
+
+      // ============================================
+      // Grabar audio del usuario
+      // ============================================
+      
+      async function startRecording() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              sampleRate: 44100
+            } 
+          });
+          
+          audioChunks = [];
+          mediaRecorder = new MediaRecorder(stream, {
+            mimeType: 'audio/webm;codecs=opus'
+          });
+
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+              audioChunks.push(event.data);
+            }
+          };
+
+          mediaRecorder.onstop = () => {
+            stream.getTracks().forEach(track => track.stop());
+            processRecording();
+          };
+
+          mediaRecorder.start();
+          setState(STATE.LISTENING);
+          updateStatus('🎤 Grabando...', 'Habla ahora. Presiona nuevamente para enviar');
+          addMessageToChat('user', '🎤 Grabando mensaje...');
+
+        } catch (error) {
+          console.error('Error al acceder al micrófono:', error);
+          updateStatus('❌ Error de micrófono', 'Permite el acceso al micrófono');
+          
+          if (error.name === 'NotAllowedError') {
+            alert('❌ Debes permitir el acceso al micrófono para usar el chatbot de voz.');
+          } else {
+            alert('❌ Error al acceder al micrófono: ' + error.message);
+          }
+        }
+      }
+
+      function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+      }
+
+      // ============================================
+      // Procesar y enviar audio
+      // ============================================
+      
+      async function processRecording() {
+        if (audioChunks.length === 0) {
+          setState(STATE.READY);
+          updateStatus('❌ No se grabó audio', 'Intenta nuevamente');
+          return;
+        }
+
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        
+        updateLastUserMessage('🗣️ Mensaje enviado');
+        setState(STATE.PROCESSING);
+        canInterrupt = false;
+        updateStatus('⏳ Procesando...', 'El asistente está pensando. No se puede interrumpir');
+
+        try {
+          // MODO DE PRUEBA: usar respuesta simulada
+          if (voiceChatbotConfig.mockMode) {
+            await simulateResponse();
+          } else {
+            await sendAudioToWebhook(audioBlob);
+          }
+        } catch (error) {
+          console.error('Error al procesar:', error);
+          setState(STATE.READY);
+          updateStatus('❌ Error', error.message);
+          addMessageToChat('bot', '❌ ' + error.message);
+        }
+      }
+
+      // ============================================
+      // Enviar a webhook (real)
+      // ============================================
+      
+      async function sendAudioToWebhook(audioBlob) {
+        if (!voiceChatbotConfig.webhookUrl) {
+          throw new Error('Webhook URL no configurada');
+        }
+
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'audio.webm');
+
+        const response = await fetch(voiceChatbotConfig.webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + voiceChatbotConfig.jwtToken
+          },
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Error del servidor: ' + response.status);
+        }
+
+        const data = await response.json();
+        
+        if (!data.audioUrl) {
+          throw new Error('La respuesta no contiene audioUrl');
+        }
+
+        await playBotResponse(data.audioUrl);
+      }
+
+      // ============================================
+      // Simular respuesta (para pruebas)
+      // ============================================
+      
+      async function simulateResponse() {
+        // Esperar 2 segundos simulando procesamiento
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // URL de audio de prueba
+        const testAudioUrl = 'https://www2.cs.uic.edu/~i101/SoundFiles/PinkPanther30.wav';
+        
+        await playBotResponse(testAudioUrl);
+      }
+
+      // ============================================
+      // Reproducir respuesta
+      // ============================================
+      
+      async function playBotResponse(audioUrl) {
+        addMessageToChat('bot', '🤖 Reproduciendo respuesta...');
+
+        audioElement.src = audioUrl;
+        audioElement.load();
+
+        await new Promise((resolve, reject) => {
+          audioElement.oncanplaythrough = resolve;
+          audioElement.onerror = () => reject(new Error('Error al cargar el audio'));
+        });
+
+        setState(STATE.SPEAKING);
+        canInterrupt = true;
+        updateStatus('🔊 Hablando...', 'Presiona el botón para interrumpir');
+
+        await audioElement.play();
+
+        audioElement.onended = () => {
+          if (currentState === STATE.SPEAKING) {
+            finishSpeaking();
+          }
+        };
+
+        updateLastBotMessage('🤖 Respuesta reproducida');
+      }
+
+      function stopSpeaking() {
+        if (audioElement) {
+          audioElement.pause();
+          audioElement.currentTime = 0;
+        }
+        
+        updateLastBotMessage('⏸️ Respuesta interrumpida');
+        addMessageToChat('user', '⏸️ Has interrumpido al asistente');
+        
+        finishSpeaking();
+      }
+
+      function finishSpeaking() {
+        canInterrupt = false;
+        setState(STATE.READY);
+        updateStatus('✅ Listo para escuchar', 'Presiona el botón para hablar nuevamente');
+      }
+
+      // ============================================
+      // Utilidades de UI
+      // ============================================
+      
+      function setState(newState) {
+        currentState = newState;
+        voiceBtn.className = newState;
+        statusIndicator.className = newState;
+        container.className = newState;
+        
+        if (newState === STATE.PROCESSING) {
+          voiceBtn.style.cursor = 'not-allowed';
+        } else {
+          voiceBtn.style.cursor = 'pointer';
+        }
+      }
+
+      function updateStatus(main, sub) {
+        mainStatus.textContent = main;
+        subStatus.textContent = sub;
+      }
+
+      function addMessageToChat(type, content) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${type}`;
+        
+        const icon = type === 'user' ? '👤' : '🤖';
+        const time = new Date().toLocaleTimeString('es-ES', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        
+        messageDiv.innerHTML = `
+          <div class="message-icon">${icon}</div>
+          <div class="message-content">
+            ${content}
+            <div class="message-time">${time}</div>
+          </div>
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function updateLastUserMessage(newContent) {
+        const messages = chatMessages.querySelectorAll('.chat-message.user');
+        if (messages.length > 0) {
+          const lastMessage = messages[messages.length - 1];
+          const contentDiv = lastMessage.querySelector('.message-content');
+          const time = contentDiv.querySelector('.message-time');
+          contentDiv.innerHTML = newContent;
+          contentDiv.appendChild(time);
+        }
+      }
+
+      function updateLastBotMessage(newContent) {
+        const messages = chatMessages.querySelectorAll('.chat-message.bot');
+        if (messages.length > 0) {
+          const lastMessage = messages[messages.length - 1];
+          const contentDiv = lastMessage.querySelector('.message-content');
+          const time = contentDiv.querySelector('.message-time');
+          contentDiv.innerHTML = newContent;
+          contentDiv.appendChild(time);
+        }
+      }
+
+      function showTemporaryMessage(message) {
+        const prevSubStatus = subStatus.textContent;
+        subStatus.textContent = message;
+        subStatus.style.color = '#ef4444';
+        
+        setTimeout(() => {
+          if (currentState === STATE.PROCESSING) {
+            subStatus.textContent = 'El asistente está pensando. No se puede interrumpir';
+          }
+          subStatus.style.color = '';
+        }, 2000);
+      }
+
+      // ============================================
+      // Inicialización
+      // ============================================
+      
+      console.log('🎙️ Voice Chatbot Test inicializado');
+      console.log('Configuración:', {
+        webhook: voiceChatbotConfig.webhookUrl || '(no configurado)',
+        mockMode: voiceChatbotConfig.mockMode
+      });
+      
+      updateStatus('✅ Listo para escuchar', 'Presiona el botón para hablar');
+
+    })();
+  </script>
+
+</body>
+</html>
