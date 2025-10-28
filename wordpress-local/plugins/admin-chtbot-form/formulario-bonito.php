@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Formulario Bonito
- * Description: Un formulario elegante hecho a mano por Jaycom 😎 con integración a n8n
- * Version: 2.0
+ * Description: Un formulario elegante hecho a mano por Jaycom 😎 con integración a n8n - Soporta PDFs, DOCX, TXT e imágenes
+ * Version: 2.1
  * Author: Camilo Orejuela
  */
 
@@ -95,6 +95,47 @@ add_action('admin_init', 'fb_registrar_configuraciones');
 // FUNCIONES JWT
 // ============================================
 
+function fb_detectar_mime_type($filename, $filepath) {
+    // Primero intentar con finfo si está disponible
+    if (function_exists('finfo_open')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime_type = finfo_file($finfo, $filepath);
+        finfo_close($finfo);
+        
+        if ($mime_type && $mime_type !== 'application/octet-stream') {
+            return $mime_type;
+        }
+    }
+    
+    // Si finfo no funciona, detectar por extensión
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    
+    // Solo los tipos de archivo permitidos para el sistema RAG
+    $mime_types = [
+        // Documentos
+        'pdf' => 'application/pdf',
+        'doc' => 'application/msword',
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'txt' => 'text/plain',
+        
+        // Imágenes
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'bmp' => 'image/bmp',
+        'svg' => 'image/svg+xml',
+        'webp' => 'image/webp',
+    ];
+    
+    if (isset($mime_types[$extension])) {
+        return $mime_types[$extension];
+    }
+    
+    // Fallback
+    return 'application/octet-stream';
+}
+
 function fb_base64url_encode($data) {
     return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 }
@@ -149,8 +190,8 @@ function fb_mostrar_formulario() {
         
         <div class="fb-group">
             <label for="archivos">Selecciona los archivos a procesar</label>
-            <input type="file" id="archivos" name="archivos[]" multiple accept="*/*" required>
-            <p class="description">Puedes seleccionar múltiples archivos. Formatos aceptados: PDF, DOCX, TXT, imágenes, etc.</p>
+            <input type="file" id="archivos" name="archivos[]" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg" required>
+            <p class="description">Puedes seleccionar múltiples archivos. Formatos aceptados: PDF, DOCX, TXT e imágenes (JPG, PNG, GIF, etc.).</p>
         </div>
 
         <div class="fb-privacy-notice">
@@ -202,6 +243,23 @@ function fb_enviar_formulario() {
         return;
     }
     
+    // Definir extensiones permitidas
+    $extensiones_permitidas = ['pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+    
+    // Validar extensiones de archivos
+    $files = $_FILES['archivos'];
+    $file_count = count($files['name']);
+    
+    for ($i = 0; $i < $file_count; $i++) {
+        $file_name = $files['name'][$i];
+        $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        
+        if (!in_array($extension, $extensiones_permitidas)) {
+            wp_send_json_error('❌ El archivo "' . $file_name . '" no es válido. Solo se permiten: PDF, DOC, DOCX, TXT e imágenes (JPG, PNG, GIF, BMP, WEBP, SVG).');
+            return;
+        }
+    }
+    
     // Obtener configuraciones
     $webhook_url = get_option('fb_webhook_url', '');
     
@@ -239,13 +297,49 @@ function fb_enviar_formulario() {
     $files = $_FILES['archivos'];
     $file_count = count($files['name']);
     $archivos_procesados = 0;
+    $archivos_info = []; // Para debugging
+    $errores_detallados = []; // Para reportar errores específicos
     
     for ($i = 0; $i < $file_count; $i++) {
-        if ($files['error'][$i] === UPLOAD_ERR_OK) {
+        $file_name = $files['name'][$i];
+        $file_error = $files['error'][$i];
+        
+        // Log detallado del estado de cada archivo
+        error_log("Procesando archivo: {$file_name}, Error code: {$file_error}");
+        
+        if ($file_error === UPLOAD_ERR_OK) {
+            // Verificar que el archivo temporal existe
+            if (!file_exists($files['tmp_name'][$i])) {
+                $errores_detallados[] = "El archivo temporal de '{$file_name}' no existe.";
+                error_log("Error: Archivo temporal no existe para {$file_name}");
+                continue;
+            }
+            
             $file_content = file_get_contents($files['tmp_name'][$i]);
-            $file_name = $files['name'][$i];
+            
+            // Verificar que se pudo leer el contenido
+            if ($file_content === false) {
+                $errores_detallados[] = "No se pudo leer el contenido de '{$file_name}'.";
+                error_log("Error: No se pudo leer contenido de {$file_name}");
+                continue;
+            }
+            
             $file_type = $files['type'][$i];
             $file_size = $files['size'][$i];
+            
+            // Detectar MIME type correcto si no está presente o es genérico
+            if (empty($file_type) || $file_type === 'application/octet-stream') {
+                $file_type = fb_detectar_mime_type($file_name, $files['tmp_name'][$i]);
+            }
+            
+            // Guardar info para log (opcional, para debugging)
+            $archivos_info[] = [
+                'nombre' => $file_name,
+                'tipo' => $file_type,
+                'tamaño' => $file_size
+            ];
+            
+            error_log("Archivo procesado OK: {$file_name} - Tipo: {$file_type} - Tamaño: {$file_size}");
             
             $payload .= '--' . $boundary . "\r\n";
             $payload .= 'Content-Disposition: form-data; name="archivos[]"; filename="' . $file_name . '"' . "\r\n";
@@ -253,11 +347,34 @@ function fb_enviar_formulario() {
             $payload .= $file_content . "\r\n";
             
             $archivos_procesados++;
+        } else {
+            // Log de errores de upload
+            $error_messages = [
+                UPLOAD_ERR_INI_SIZE => 'El archivo excede el tamaño máximo permitido por el servidor.',
+                UPLOAD_ERR_FORM_SIZE => 'El archivo excede el tamaño máximo del formulario.',
+                UPLOAD_ERR_PARTIAL => 'El archivo se subió parcialmente.',
+                UPLOAD_ERR_NO_FILE => 'No se subió ningún archivo.',
+                UPLOAD_ERR_NO_TMP_DIR => 'Falta la carpeta temporal.',
+                UPLOAD_ERR_CANT_WRITE => 'No se pudo escribir el archivo en el disco.',
+                UPLOAD_ERR_EXTENSION => 'Una extensión de PHP detuvo la subida del archivo.'
+            ];
+            
+            $error_msg = isset($error_messages[$file_error]) 
+                ? $error_messages[$file_error] 
+                : 'Error desconocido (código: ' . $file_error . ')';
+            
+            $errores_detallados[] = "'{$file_name}': {$error_msg}";
+            error_log("Error subiendo archivo {$file_name}: {$error_msg}");
         }
     }
     
     if ($archivos_procesados === 0) {
-        wp_send_json_error('No se pudieron procesar los archivos. Por favor intenta de nuevo.');
+        $mensaje_error = 'No se pudieron procesar los archivos.';
+        if (!empty($errores_detallados)) {
+            $mensaje_error .= '<br><br><strong>Detalles:</strong><br>' . implode('<br>', $errores_detallados);
+        }
+        error_log("ERROR FINAL: No se procesó ningún archivo. Total intentados: {$file_count}");
+        wp_send_json_error($mensaje_error);
         return;
     }
     
