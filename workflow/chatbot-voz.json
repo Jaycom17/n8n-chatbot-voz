@@ -3,47 +3,218 @@
   "nodes": [
     {
       "parameters": {
-        "url": "=https://graph.facebook.com/v24.0/{{ $json.audio_id }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
+        "method": "POST",
+        "url": "http://127.0.0.1:8069/jsonrpc",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"call\",\n  \"params\": {\n    \"service\": \"object\",\n    \"method\": \"execute_kw\",\n    \"args\": [\n      \"{{ $json.database }}\", \n      {{ $json.admin_id }}, \n      \"{{ $json.admin_password }}\",\n      \"crm.lead\", \n      \"search_read\", \n      [[[\"phone_sanitized\", \"=\", \"+{{ $('Extraer datos importantes').item.json.phone_number }}\"]]],\n      {\"fields\": [\"id\", \"stage_id\"]}\n    ]\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        96,
-        -304
+        1440,
+        80
       ],
-      "id": "75107e8c-4a49-4296-b19c-acc7bbb645bb",
-      "name": "Extraer información del audio del mensaje",
+      "id": "3c6f16ae-2928-4508-a97c-53b71c5016c9",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "42254cb6-6689-4c51-9742-5b0004bdd4c4",
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1696,
+        80
+      ],
+      "id": "4f1517a7-012b-4125-a569-f5632b36a980",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Set-Message').item.json.message }}",
+        "options": {
+          "systemMessage": "=Eres un asistente de ventas virtual realista, empático y profesional, encargado de mantener conversaciones naturales con potenciales clientes para recopilar información comercial relevante.\nTu objetivo es extraer y actualizar la información del lead sin que el cliente se dé cuenta de que está siendo registrado en un CRM.\n\n🎯 Objetivo principal\n\nTu tarea es conversar con el cliente de forma natural, generar confianza y, mediante el diálogo, obtener los datos necesarios para crear o completar un lead.\n\nLos datos clave incluyen (pero no se limitan a):\n\nName\n\nEmail\n\nPhone\n\nExpected Revenue\n\nProbability\n\nInternal Notes → sé muy explícito con estas notas: describe cualquier detalle que pueda ser útil (intereses, necesidades, tono, urgencia, contexto, etc.). Cada vez que haya nueva información, añádela en lugar de reemplazarla.\n\n⚙️ Comportamiento del agente\n🟢 Inicio de la conversación\n\nSaluda cordialmente al usuario.\n\nUsa un tono amable, cercano y natural.\n\nNunca menciones palabras como lead, oportunidad, registro, CRM o sistema.\n\nHabla como un asesor comercial real que busca ayudar al cliente.\n\nSIEMPRE ACTUALIZA EL LEAD LLAMANDO A UPDATE_LEAD TRAS CADA MENSAJE, NO DEJES QUE SE PIEDA NADA DE INFORMACIÓN.\n\nINDEPENDIENTEMENTE DEL MENSAJE QUE EL USUARIO ENVIE SIEMPRE DA UNA RESPUESTA.\n\n🧩 Análisis de información\n\nAnaliza cuidadosamente el input recibido.\n\nLlama siempre primero a la herramienta get_lead para obtener la información actual del lead (si ya existe).\n\nIdentifica si el mensaje del usuario contiene información útil o relevante para completar o actualizar el lead.\n\n🛠️ Actualización del lead\n\nSIEMPRE ANTES DE ACTUALIZAR, SIEMPRE LLAMA PRIMERO A GET_LEAD, asi verificas la información para no borrar la que ya se ha recolectado.\n\nSi el mensaje contiene información relevante (nombre, correo, teléfono, interés, etc.), solo actualiza los campos que realmente cambien.\n\nAntes de actualizar:\n\nLlama a get_lead y obtén los datos actuales.\n\nCompara la nueva información con la existente.\n\nSolo realiza update_lead si el cambio es necesario y significativo.\n\nNunca borres información ni dejes un campo vacío.\n\nSi agregas algo en Internal Notes, añádelo al texto actual, sin sobrescribir lo anterior.\n\nCada vez que obtengas un nuevo dato válido, actualízalo inmediatamente para evitar pérdida de información.\n\n⚠️ No se debe perder información importante bajo ninguna circunstancia.\n\n💬 Obtención de información faltante\n\nSi el usuario no brinda información relevante, responde con lenguaje natural para guiar la conversación y obtener los datos faltantes.\n\nEjemplos:\n\n“Perfecto 😊 ¿Podrías contarme cómo te gustaría que te contactemos, por WhatsApp o por correo?”\n“Genial, ¿me compartes tu nombre para poder atenderte mejor?”\n\nHazlo siempre de forma fluida y humana, sin parecer un formulario.\n\n🔚 Cierre de la conversación\n\nSi el lead ya tiene toda la información necesaria, puedes cerrar la conversación de forma natural, confirmando que pronto un asesor se pondrá en contacto.\n\nSi el cliente desea seguir conversando, continúa sin problema, siempre con un tono amable, servicial y profesional.\n\n📋 Reglas y consideraciones importantes\n\nSIEMPRE SEA EL MENSAJE QUE SEA LLAMA A LA HERRAMIENTA RAG PARA OBTENER INFORMACIÓN DE LA EMPRESA, HAZLO SIEMPRE, NO IMPORTA QIE CLASE DE MENSAJE SEA, ANTES DE RESPONDER O HACER CUANLQUIER COSA LLAMA A RAG.\n\nNunca reveles que estás recopilando datos o actualizando un CRM.\n\nNunca uses lenguaje técnico ni menciones herramientas internas.\n\nNunca borres ni sobreescribas información existente; solo agrega o modifica cuando sea estrictamente necesario.\n\nSiempre llama a get_lead antes de actualizar para comparar y preservar los datos actuales.\n\nSi el cliente deja de responder, la información recopilada hasta ese momento ya debe estar guardada.\n\nSi detectas que existe una oportunidad o lead con los mismos datos (nombre, correo, teléfono, etc.), ignórala y trata al usuario como un nuevo contacto.\n\nEvita respuestas genéricas. Cada mensaje debe parecer una respuesta genuina y personalizada al usuario.\n\nMantén un tono conversacional humano y natural, adaptado al contexto (formal o informal según el estilo del cliente).\n\n🔄 Flujo resumido de acciones\n\nAnalizar input del usuario.\n\n→ Llamar a get_lead para obtener datos actuales.\n\n→ Si hay información relevante y diferente → update_lead solo con los cambios necesarios.\n\n→ Si falta información → preguntar con naturalidad.\n\n→ Repetir el ciclo hasta completar los datos o hasta que el usuario deje de responder"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        -448
+      ],
+      "id": "d2609bed-6d3b-45ac-81f7-765e07769e4b",
+      "name": "AI Agent2",
+      "retryOnFail": true,
+      "waitBetweenTries": 500
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Update an opportunity - lead in Odoo",
+        "resource": "opportunity",
+        "operation": "update",
+        "opportunityId": "={{ $('If').item.json.result[0].id }}",
+        "updateFields": {
+          "email_from": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email', ``, 'string') }}",
+          "expected_revenue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Expected_Revenue', ``, 'number') }}",
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Internal_Notes', ``, 'string') }}",
+          "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
+          "phone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone', ``, 'string') }}",
+          "probability": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Probability', ``, 'number') }}"
+        }
+      },
+      "type": "n8n-nodes-base.odooTool",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        -32
+      ],
+      "id": "3e8b630c-e254-4d66-83d4-4eb0dcb45070",
+      "name": "uptade_lead",
       "credentials": {
-        "httpBearerAuth": {
-          "id": "ADVGaaBQR3MyG8VW",
-          "name": "Bearer Auth account"
+        "odooApi": {
+          "id": "Uzw2Lhn2Nw9kby13",
+          "name": "odoolocal"
         }
       }
     },
     {
       "parameters": {
-        "url": "={{ $json.url }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
+        "descriptionType": "manual",
+        "toolDescription": "Get an opportunity - lead in Odoo",
+        "resource": "opportunity",
+        "operation": "get",
+        "opportunityId": "={{ $json.result[0].id }}",
         "options": {}
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "type": "n8n-nodes-base.odooTool",
+      "typeVersion": 1,
       "position": [
-        288,
-        -304
+        2816,
+        -48
       ],
-      "id": "0e674395-6cb2-46bd-8ea9-981ed0097c5a",
-      "name": "Extraer audio del mensaje",
+      "id": "3a1673e6-ea20-4bc7-8d92-04d330396012",
+      "name": "get_lead",
       "credentials": {
-        "httpBearerAuth": {
-          "id": "ADVGaaBQR3MyG8VW",
-          "name": "Bearer Auth account"
+        "odooApi": {
+          "id": "Uzw2Lhn2Nw9kby13",
+          "name": "odoolocal"
         }
       }
+    },
+    {
+      "parameters": {
+        "queue": "whatsapp_messages",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1392,
+        160
+      ],
+      "id": "3ea2f095-d768-4e06-8082-00767ca3d3d4",
+      "name": "RabbitMQ Trigger",
+      "credentials": {
+        "rabbitmq": {
+          "id": "wGfxPaeVNVVKPAG5",
+          "name": "RabbitMQ account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1e541a8f-e7f9-4935-8916-6ec875085f9f",
+              "name": "data",
+              "value": "={{ JSON.parse($json.content) }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1152,
+        160
+      ],
+      "id": "9c9b0176-7056-4299-b2f4-7a71c1e8a2a9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "48ee3b63-39ed-4e00-b6e6-7a6653670478",
+              "name": "message",
+              "value": "={{ $json.text_message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        176
+      ],
+      "id": "edceef26-d331-43bd-b127-0549ef264b07",
+      "name": "sacar mensaje (text)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ed0f4263-69da-41c5-96f7-ec7f36144880",
+              "name": "message",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        -32
+      ],
+      "id": "8bd1f7ef-8707-4882-9a30-0f636c3b0807",
+      "name": "sacar mensaje (voz)"
     },
     {
       "parameters": {
@@ -60,15 +231,37 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        448,
-        -304
+        112,
+        -32
       ],
-      "id": "8c3eafb6-a8a6-45df-bfb0-6e7f6a506c41",
+      "id": "fd49c3d0-d7e7-4852-b283-e3556f597655",
       "name": "Sacar texto",
       "credentials": {
         "googlePalmApi": {
           "id": "SeCrTTncIM1WuK4g",
           "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -112,
+        -32
+      ],
+      "id": "7ba0cf88-44a3-493f-ba08-68e58571ff94",
+      "name": "Extraer audio del mensaje",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "ADVGaaBQR3MyG8VW",
+          "name": "Bearer Auth account"
         }
       }
     },
@@ -100,97 +293,11 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -128,
-        112
+        -704,
+        160
       ],
-      "id": "af4b3316-a5d0-41ef-9015-388c224ad726",
+      "id": "00a75cbe-818d-4154-bf89-3b9b903c5dea",
       "name": "Verificar si es audio o texto"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "={{ $json.message }}",
-        "options": {
-          "systemMessage": "=Eres un asistente especializado en gestión de contactos y automatización empresarial.  \nTu función es interpretar mensajes de usuarios que llegan desde WhatsApp (en texto o transcritos desde audio)\ny extraer la información necesaria para crear, actualizar, eliminar o listar contactos en el CRM de Odoo.\n\n🎯 Objetivo\n\nAnalizar el mensaje recibido y determinar si el usuario quiere crear, actualizar, eliminar o listar contactos.  \nCuando se trate de creación o actualización, debes extraer los siguientes campos si están presentes:\n\n- Nombre completo del contacto  \n- Correo electrónico  \n- Número de teléfono\n\n📦 Formato de salida\n\nSiempre responde en formato JSON válido con las siguientes claves:\n\n{\n  \"action\": \"create_contact\" | \"update_contact\" | \"delete_contact\" | \"list_contacts\" | \"ignore\",\n  \"data\": {\n    \"id\": \"number | null\",\n    \"name\": \"string | null\",\n    \"email\": \"string | null\",\n    \"phone\": \"string | null\"\n  },\n  \"output_message\": \"string\"\n}\n\n🧩 Reglas de interpretación\n\n- Si el mensaje contiene instrucciones como “crear contacto”, “registra a”, “añadir cliente”, interpreta la acción como `\"create_contact\"`.\n- Si el mensaje menciona “lista contactos”, “muéstrame los contactos”, “ver contactos”, interpreta la acción como `\"list_contacts\"`.\n- Si el mensaje indica “actualiza”, “modifica”, “corrige”, interpreta la acción como `\"update_contact\"`.\n- Si el mensaje indica “elimina”, “borra”, “quita contacto”, interpreta la acción como `\"delete_contact\"`.\n- Los valores no mencionados deben ir como `null`.\n- Si el mensaje no tiene relación con contactos, devuelve `\"action\": \"ignore\"`.\n\n---\n\n🪄 Lógica interna de comportamiento\n\n➕ Creación de contacto (`create_contact`)\n1. Si se indica crear un contacto, extrae los datos disponibles (`name`, `email`, `phone`).\n2. Antes de crear, **verifica internamente** si ya existe un contacto con ese nombre, correo o teléfono.\n3. Si ya existe, responde con un mensaje como:\n   `\"⚠️ Ya existe un contacto llamado 'María Gómez'. ¿Deseas actualizarlo?\"`\n4. Si no existe, procede con la creación.\n\n---\n\n🧾 Listado de contactos (`list_contacts`)\n1. Si el usuario pide listar contactos, llama internamente a la herramienta de listado.\n2. Si hay contactos, genera un mensaje legible tipo:\n📇 Estos son tus contactos actuales:\n1️⃣ (ID: 8) María Gómez – maria.gomez@empresa.com – 3124567890\n2️⃣ (ID: 12) Juan Pérez – juanperez@gmail.com – 3109988776\n\nyaml\nCopiar código\nDonde se incluye el `id` de cada contacto al inicio.\n3. Si no hay ninguno, responde:\n`\"📭 No tienes contactos registrados en este momento.\"`\n\n---\n\n✏️ Actualización de contacto (`update_contact`)\n1. Primero **busca internamente** el contacto por nombre, correo o teléfono para obtener su `id`.\n2. Si no existe, responde:\n`\"⚠️ No encontré ningún contacto llamado 'Juan Pérez'. ¿Podrías verificar el nombre?\"`\n3. Si se encuentra el contacto, utiliza su `id` y los nuevos datos (`email`, `phone`, etc.) para actualizarlo.\n4. Devuelve un mensaje amigable como:\n`\"✅ Se actualizó correctamente el número de teléfono de 'Juan Pérez'.\"`\n\n---\n\n🗑️ Eliminación de contacto (`delete_contact`)\n1. Primero **busca internamente** el contacto por nombre, correo o teléfono para obtener su `id`.\n2. Si no se encuentra, responde:\n`\"⚠️ No encontré ningún contacto llamado 'María Gómez'. ¿Podrías verificar el nombre?\"`\n3. Si se encuentra, utiliza el `id` para eliminar el contacto.\n4. Devuelve un mensaje como:\n`\"🗑️ El contacto 'María Gómez' fue eliminado correctamente.\"`\n\n---\n\n💬 Ejemplos\n\nEntrada:\n“Crea contacto: María Gómez, correo maria.gomez@empresa.com, teléfono 3124567890”\n\nSalida:\n\n{\n\"action\": \"create_contact\",\n\"data\": {\n \"id\": null,\n \"name\": \"María Gómez\",\n \"email\": \"maria.gomez@empresa.com\",\n \"phone\": \"3124567890\"\n},\n\"output_message\": \"✅ Contacto 'María Gómez' registrado correctamente en tu lista de contactos.\"\n}\nEntrada:\n\n“Muéstrame los contactos que tengo actualmente”\n\nSalida:\n\n{\n  \"action\": \"list_contacts\",\n  \"data\": {\n    \"id\": null,\n    \"name\": null,\n    \"email\": null,\n    \"phone\": null\n  },\n  \"output_message\": \"📇 Estos son tus contactos actuales:\\n1️⃣ (ID: 8) María Gómez – maria.gomez@empresa.com – 3124567890\\n2️⃣ (ID: 12) Juan Pérez – juanperez@gmail.com – 3109988776\"\n}\n\nEntrada:\n\n“Actualiza el número de teléfono de Juan Pérez a 3214567890”\n\nSalida:\n\n- PASO 1:\n{\n  \"action\": \"list_contacts\",\n  \"data\": {\n    \"id\": null,\n    \"name\": null,\n    \"email\": null,\n    \"phone\": null\n  },\n  \"output_message\": \"📇 Estos son tus contactos actuales:\\n1️⃣ (ID: 8) María Gómez – maria.gomez@empresa.com – 3124567890\\n2️⃣ (ID: 12) Juan Pérez – juanperez@gmail.com – 3109988776\"\n}\n\nPASO 2 (extraes el id del paso 1):\n\n{\n  \"action\": \"update_contact\",\n  \"data\": {\n    \"id\": 12,\n    \"name\": \"Juan Pérez\",\n    \"email\": null,\n    \"phone\": \"3214567890\"\n  },\n  \"output_message\": \"✅ Se actualizó correctamente el número de teléfono de 'Juan Pérez'.\"\n\n}\n\nEntrada:\n\n“Elimina el contaco, María Gómez”\n\nSalida:\n\n- PASO 1:\n\n{\n  \"action\": \"list_contacts\",\n  \"data\": {\n    \"id\": null,\n    \"name\": null,\n    \"email\": null,\n    \"phone\": null\n  },\n  \"output_message\": \"📇 Estos son tus contactos actuales:\\n1️⃣ (ID: 8) María Gómez – maria.gomez@empresa.com – 3124567890\\n2️⃣ (ID: 12) Juan Pérez – juanperez@gmail.com – 3109988776\"\n}\n\nPASO 2 (extraes el id del paso 1):\n\n{\n  \"action\": \"delete_contact\",\n  \"data\": {\n    \"id\": 8,\n    \"name\": \"María Gómez\",\n    \"email\": null,\n    \"phone\": null\n  },\n  \"output_message\": \"🗑️ El contacto 'María Gómez' fue eliminado correctamente.\"\n}"
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 2.2,
-      "position": [
-        1008,
-        128
-      ],
-      "id": "e7068bb0-5571-4734-973b-9e5435f3dc2a",
-      "name": "AI Agent"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
-      "position": [
-        800,
-        336
-      ],
-      "id": "89c43723-31fb-43e8-b36f-3cf679858336",
-      "name": "Google Gemini Chat Model",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "SeCrTTncIM1WuK4g",
-          "name": "Google Gemini(PaLM) Api account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "descriptionType": "manual",
-        "toolDescription": "This service create a new contact in odoo, this need a name, email and phone.",
-        "contactName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
-        "additionalFields": {
-          "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email', ``, 'string') }}",
-          "phone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone', ``, 'string') }}"
-        }
-      },
-      "type": "n8n-nodes-base.odooTool",
-      "typeVersion": 1,
-      "position": [
-        1216,
-        336
-      ],
-      "id": "900a4f1b-692c-466e-b900-d0ae261d6d39",
-      "name": "create_contact",
-      "credentials": {
-        "odooApi": {
-          "id": "Ogp920Ri8KijBU6t",
-          "name": "Odoo account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "descriptionType": "manual",
-        "toolDescription": "List contacts in odoo",
-        "operation": "getAll",
-        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
-        "options": {
-          "fieldsList": []
-        }
-      },
-      "type": "n8n-nodes-base.odooTool",
-      "typeVersion": 1,
-      "position": [
-        960,
-        336
-      ],
-      "id": "1633d892-1ef0-473c-884c-e12a90dab230",
-      "name": "list_contacts",
-      "credentials": {
-        "odooApi": {
-          "id": "Ogp920Ri8KijBU6t",
-          "name": "Odoo account"
-        }
-      }
     },
     {
       "parameters": {
@@ -199,31 +306,31 @@
             {
               "id": "4e5a13ec-d192-46e0-9cb4-eb05b0b300f4",
               "name": "phone_number_id",
-              "value": "={{ $json.data[0].body.entry[0].changes[0].value.metadata.phone_number_id }}",
+              "value": "={{ $json.data.phone_number_id }}",
               "type": "string"
             },
             {
               "id": "4dc6fcd6-0668-40c1-a83b-c25afad049d8",
               "name": "type",
-              "value": "={{ $json.data[0].body.entry[0].changes[0].value.messages[0].type }}",
+              "value": "={{ $json.data.type }}",
               "type": "string"
             },
             {
               "id": "9999eacf-24bd-46a2-8997-108a96cfa583",
               "name": "phone_number",
-              "value": "={{ $json.data[0].body.entry[0].changes[0].value.messages[0].from }}",
+              "value": "={{ $json.data.from }}",
               "type": "string"
             },
             {
               "id": "bf0915df-8ceb-409c-a885-de2a165bc294",
               "name": "audio_id",
-              "value": "={{ $json.data[0].body.entry[0].changes[0].value.messages[0].audio.id }}",
+              "value": "={{ $json.data.audio_id }}",
               "type": "string"
             },
             {
               "id": "fb8272b8-b9d5-450f-a73c-f8ba4a8e59c6",
               "name": "text_message",
-              "value": "={{ $json.data[0].body.entry[0].changes[0].value.messages[0].text.body }}",
+              "value": "={{ $json.data.body }}",
               "type": "string"
             }
           ]
@@ -233,19 +340,154 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -272,
-        112
+        -944,
+        160
       ],
-      "id": "16dc66e3-fa65-4014-b7cc-621c189e6116",
+      "id": "ef0e9e86-fe7f-466c-815c-6f17594e21ef",
       "name": "Extraer datos importantes"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8069/jsonrpc",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        80
+      ],
+      "id": "399941a4-56a7-4c3c-b7d3-484a04542f22",
+      "name": "Login odoo",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "i4ZINaAUMXjxryRk",
+          "name": "odoo_login"
+        }
+      }
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
             {
-              "id": "ed0f4263-69da-41c5-96f7-ec7f36144880",
+              "id": "070069db-9e2f-405b-a957-bc42244e42ad",
+              "name": "admin_id",
+              "value": "={{ $json.result }}",
+              "type": "number"
+            },
+            {
+              "id": "874fc889-d953-4c89-9cbb-081f37b740ff",
+              "name": "admin_password",
+              "value": "Admin123@",
+              "type": "string"
+            },
+            {
+              "id": "6ddb2efa-5018-4c01-a25d-4eb2882ffd5e",
+              "name": "database",
+              "value": "test-n8n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        80
+      ],
+      "id": "33e7759f-694e-4d74-922a-0094d9c9860a",
+      "name": "Set_Credentials"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8069/jsonrpc",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"call\",\n  \"params\": {\n    \"service\": \"object\",\n    \"method\": \"execute_kw\",\n    \"args\": [\n      \"{{ $('Set_Credentials').item.json.database }}\",         \n      {{ $('Set_Credentials').item.json.admin_id }},                  \n      \"{{ $('Set_Credentials').item.json.admin_password }}\",     \n      \"crm.lead\",         \n      \"create\",            \n      [\n        {\n          \"name\": \"Posible cliente\",\n          \"phone\": \"+{{ $('Extraer datos importantes').item.json.phone_number }}\",\n          \"description\": \"Primer mensaje enviado: {{ $('Set-Message').item.json.message }}\"\n        }\n      ]\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2384,
+        544
+      ],
+      "id": "7dfad44f-4654-44a2-a9b4-f195843f9045",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a440f30e-924a-4d18-9828-4f8cc3ff56b5",
               "name": "message",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        80
+      ],
+      "id": "0bcd2bd1-e41e-4087-8dee-188c0ce71a22",
+      "name": "Set-Message"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres un asistente de ventas virtual realista, empático y profesional, encargado de mantener conversaciones naturales con potenciales clientes para recopilar información comercial relevante.\nTu objetivo es extraer y actualizar la información del lead sin que el cliente se dé cuenta de que está siendo registrado en un CRM.\n\n🎯 Objetivo principal\n\nTu tarea es conversar con el cliente de forma natural, generar confianza y, mediante el diálogo, obtener los datos necesarios para crear o completar un lead.\n\nLos datos clave incluyen (pero no se limitan a):\n\nName\n\nEmail\n\nPhone\n\nExpected Revenue\n\nProbability\n\nInternal Notes → sé muy explícito con estas notas: describe cualquier detalle que pueda ser útil (intereses, necesidades, tono, urgencia, contexto, etc.). Cada vez que haya nueva información, añádela en lugar de reemplazarla.\n\n⚙️ Comportamiento del agente\n🟢 Inicio de la conversación\n\nSaluda cordialmente al usuario.\n\nUsa un tono amable, cercano y natural.\n\nNunca menciones palabras como lead, oportunidad, registro, CRM o sistema.\n\nHabla como un asesor comercial real que busca ayudar al cliente.",
+              "role": "model"
+            },
+            {
+              "content": "={{ $('Set-Message').item.json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        2576,
+        544
+      ],
+      "id": "bb1abd87-39ad-41d9-a64c-4eeac162f940",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SeCrTTncIM1WuK4g",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5446255f-91cf-457b-8e10-770b0fc8d36c",
+              "name": "output",
               "value": "={{ $json.content.parts[0].text }}",
               "type": "string"
             }
@@ -256,222 +498,11 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        608,
-        -304
+        2912,
+        544
       ],
-      "id": "47528200-3dd2-4dd2-b3d9-f85897b592b4",
-      "name": "sacar mensaje (voz)"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "48ee3b63-39ed-4e00-b6e6-7a6653670478",
-              "name": "message",
-              "value": "={{ $json.text_message }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        592,
-        128
-      ],
-      "id": "855df55c-ed72-4cf2-8813-eae93abf1467",
-      "name": "sacar mensaje (text)"
-    },
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "1c46a683-a619-4fe8-84df-74ec07cf9ea6",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        -528,
-        16
-      ],
-      "id": "a9257b63-35a6-443b-97a0-af9ee575ddfc",
-      "name": "Webhook",
-      "webhookId": "1c46a683-a619-4fe8-84df-74ec07cf9ea6"
-    },
-    {
-      "parameters": {
-        "descriptionType": "manual",
-        "toolDescription": "Update contact information in odoo",
-        "operation": "update",
-        "contactId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Contact_ID', ``, 'string') }}",
-        "updateFields": {
-          "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email', ``, 'string') }}",
-          "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
-          "phone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone', ``, 'string') }}"
-        }
-      },
-      "type": "n8n-nodes-base.odooTool",
-      "typeVersion": 1,
-      "position": [
-        1088,
-        336
-      ],
-      "id": "81f57610-d693-4218-a655-fae90b6caa54",
-      "name": "update_contact",
-      "credentials": {
-        "odooApi": {
-          "id": "Ogp920Ri8KijBU6t",
-          "name": "Odoo account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "descriptionType": "manual",
-        "toolDescription": "Delete a contact in Odoo",
-        "operation": "delete",
-        "contactId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Contact_ID', ``, 'string') }}"
-      },
-      "type": "n8n-nodes-base.odooTool",
-      "typeVersion": 1,
-      "position": [
-        1344,
-        336
-      ],
-      "id": "c695a5e2-a41f-41b4-b70a-e561c28645f4",
-      "name": "delete_contact",
-      "credentials": {
-        "odooApi": {
-          "id": "Ogp920Ri8KijBU6t",
-          "name": "Odoo account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  let output = item.json.output;\n\n  // Limpia el texto en caso de que esté envuelto en ```json ... ```\n  if (output.startsWith(\"```json\")) {\n    output = output.replace(/```json\\s*/, \"\"); // elimina el inicio ```json y salto\n    output = output.replace(/```$/, \"\");       // elimina el cierre ```\n    output = output.trim();\n  }\n\n  try {\n    if (!output.includes(\"{\")) {\n      item.json.message = output;\n    }else{\n    const parsed = JSON.parse(output);\n    item.json.message = parsed.output_message || \"⚠️ No se encontró mensaje de salida.\";\n    }\n  } catch (error) {\n    item.json.message = \"⚠️ Error al procesar el JSON: \" + error.message;\n  }\n}\n\nreturn $input.all();\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1376,
-        -112
-      ],
-      "id": "054b1642-8943-4f7b-b79f-d3bb14d221ed",
-      "name": "Extraer mensaje de respuesta"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://graph.facebook.com/v21.0/{{ $('Extraer datos importantes').item.json.phone_number_id }}/messages",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": {{ $('Extraer datos importantes').item.json.phone_number }},\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{$json[\"message\"].replace(/\\n/g, \"\\\\n\")}}\"\n  }\n}\n",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        2048,
-        -80
-      ],
-      "id": "6a15d95d-14c3-4733-96ec-0c1c03060834",
-      "name": "Enviar mensaje de respuesta",
-      "credentials": {
-        "httpBearerAuth": {
-          "id": "ADVGaaBQR3MyG8VW",
-          "name": "Bearer Auth account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "audio",
-        "input": "={{ $json.message }}",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.8,
-      "position": [
-        1568,
-        224
-      ],
-      "id": "3221e88e-fdba-4269-beab-4e3ce69d0866",
-      "name": "Generate audio",
-      "credentials": {
-        "openAiApi": {
-          "id": "DSfsxFaB4EgTBTgo",
-          "name": "OpenAi account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://graph.facebook.com/v19.0/{{ $('Extraer datos importantes').item.json.phone_number_id }}/media",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "sendBody": true,
-        "contentType": "multipart-form-data",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "parameterType": "formBinaryData",
-              "name": "file"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        1648,
-        16
-      ],
-      "id": "e5e8e5de-be3d-4556-aba4-c3b906d96cca",
-      "name": "HTTP Request",
-      "credentials": {
-        "httpBearerAuth": {
-          "id": "ADVGaaBQR3MyG8VW",
-          "name": "Bearer Auth account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.data = [{\"headers\": {\"host\": \"localhost:5678\",\"user-agent\": \"facebookexternalua\",\"content-length\": \"509\",\"accept\": \"application/json, text/plain, */*\",\"content-type\": \"application/json\",\"idempotency-key\": \"evt_4xMlu2LU49V4g92JRu\",\"x-hookdeck-attempt-count\": \"1\",\"x-hookdeck-attempt-trigger\": \"INITIAL\",\"x-hookdeck-connection-name\": \"default\",\"x-hookdeck-destination-name\": \"Source-default\",\"x-hookdeck-event-url\": \"https://dashboard.hookdeck.com/cli/events/evt_4xMlu2LU49V4g92JRu\",\"x-hookdeck-eventid\": \"evt_4xMlu2LU49V4g92JRu\",\"x-hookdeck-original-ip\": \"2a03:2880:12ff:1::\",\"x-hookdeck-requestid\": \"req_Cijwkob8dttzgm2ujr5Y\",\"x-hookdeck-signature\": \"tX9qMZyp4/uqnjYQ4sOeO/I1bNM+3NiQjL+V94dY2sE=\",\"x-hookdeck-source-name\": \"Source\",\"x-hookdeck-verified\": \"false\",\"x-hookdeck-will-retry-after\": \"\",\"x-hub-signature\": \"sha1=903bd5cf74afc064a83799c024dee1252d97c0cf\",\"x-hub-signature-256\": \"sha256=e09bb4a8ebca75ba61b66e4e22873daec61cf0d72a98652aec3acd1a32d9b666\",\"accept-encoding\": \"gzip\"},\"params\": {},\"query\": {},\"body\": {\"object\": \"whatsapp_business_account\",\"entry\": [{\"id\": \"2021864795312265\",\"changes\": [{\"value\": {\"messaging_product\": \"whatsapp\",\"metadata\": {\"display_phone_number\": \"15556300258\",\"phone_number_id\": \"861953340328352\"},\"contacts\": [{\"profile\": {\"name\": \"Jaycom\"},\"wa_id\": \"573217586380\"}],\"messages\": [{\"from\": \"573217586380\",\"id\": \"wamid.HBgMNTczMjE3NTg2MzgwFQIAEhggQUMwMTg2NzM2OERENUE3OEQyMjk1MjREQzEwNkNENUYA\",\"timestamp\": \"1760903071\",\"text\": {\"body\": \"crea una oportunidad que se llame algo 1\"},\"type\": \"text\"}]},\"field\": \"messages\"}]}]},\"webhookUrl\": \"http://localhost:5678/webhook-test/1c46a683-a619-4fe8-84df-74ec07cf9ea6\",\"executionMode\": \"test\"}]\n\n}\n\nreturn $input.all();"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -512,
-        272
-      ],
-      "id": "beb2eeab-e548-4886-b346-b192f7462f7d",
-      "name": "Code in JavaScript"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "={{ $json.message }}",
-        "options": {
-          "systemMessage": "Llama a la herramienta y crea una oportunidad en odoo con el nombre que quieras"
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 2.2,
-      "position": [
-        1024,
-        -336
-      ],
-      "id": "6202f89d-a92e-4efa-b3cc-be1335fad272",
-      "name": "AI Agent1"
+      "id": "3021f055-1a46-4a56-a5b0-94811bf401a1",
+      "name": "Edit Fields1"
     },
     {
       "parameters": {
@@ -480,11 +511,11 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        912,
-        -128
+        2352,
+        -240
       ],
-      "id": "33472849-5f9f-45c1-921c-02f0ded958b3",
-      "name": "Google Gemini Chat Model1",
+      "id": "cb80ca3b-df7a-419b-bcd7-9640dc5aaf6e",
+      "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
           "id": "SeCrTTncIM1WuK4g",
@@ -494,78 +525,902 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://localhost:8069/jsonrpc",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpBearerAuth",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"jsonrpc\": \"2.0\",\n  \"method\": \"call\",\n  \"params\": {\n    \"service\": \"object\",\n    \"method\": \"execute_kw\",\n    \"args\": [\n      \"test-n8n\",     \n      2,             \n\"51ad3c30b2d2b724c0d80fdaa62f0a46422f3869\",  \n      \"crm.lead\",    \n      \"create\",      \n      [\n        {\n          \"name\": \"Lead desde n8n\",\n          \"contact_name\": \"Juan Pérez\",\n          \"email_from\": \"juan@example.com\"\n        }\n      ]\n    ]\n  }\n}\n",
+        "httpMethod": "POST",
+        "path": "0202d3c5-0352-491b-a12e-ae7b2a06be73",
+        "authentication": "jwtAuth",
         "options": {}
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
       "position": [
-        1488,
-        -32
+        1040,
+        -1200
       ],
-      "id": "cb908bbd-29db-43cf-a6b1-46cc7c656c17",
-      "name": "HTTP Request1",
+      "id": "e92d9459-2603-4813-a9e7-b1c252e8be99",
+      "name": "Webhook",
+      "webhookId": "0202d3c5-0352-491b-a12e-ae7b2a06be73",
       "credentials": {
-        "httpBearerAuth": {
-          "id": "MKKsMpeG3762M6fP",
-          "name": "odoo local"
+        "jwtAuth": {
+          "id": "rJtC9IvgbM1g5KdE",
+          "name": "JWT Auth account"
         }
       }
     },
     {
       "parameters": {
-        "resource": "opportunity",
-        "opportunityName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
-        "additionalFields": {}
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file_name",
+                "value": "={{ $('Code in JavaScript').item.json.fileName }}"
+              }
+            ]
+          }
+        }
       },
-      "type": "n8n-nodes-base.odooTool",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        2656,
+        -960
+      ],
+      "id": "f098f344-b954-49ed-b561-527c61233167",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 500,
+        "chunkOverlap": 20,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
       "typeVersion": 1,
       "position": [
-        1200,
-        -128
+        2784,
+        -832
       ],
-      "id": "4a04aba8-5c61-4557-8976-0242d54a0363",
-      "name": "Create an opportunity in Odoo",
+      "id": "d3ac86f6-d5fd-4614-bb9a-e856516819a5",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2496,
+        -960
+      ],
+      "id": "959ac45e-7907-471f-b9ba-433b2cb7783b",
+      "name": "Embeddings Google Gemini",
       "credentials": {
-        "odooApi": {
-          "id": "Uzw2Lhn2Nw9kby13",
-          "name": "Odoo account 2"
+        "googlePalmApi": {
+          "id": "SeCrTTncIM1WuK4g",
+          "name": "Google Gemini(PaLM) Api account"
         }
       }
     },
     {
       "parameters": {
-        "sessionIdType": "customKey"
+        "mode": "insert",
+        "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
       "typeVersion": 1.3,
       "position": [
-        1056,
-        -128
+        2624,
+        -1184
       ],
-      "id": "6409be7f-c08b-4af0-bb92-634b4fe56628",
-      "name": "Postgres Chat Memory",
+      "id": "a723a15d-dd38-4514-bd63-b92ac8ac5415",
+      "name": "Postgres PGVector Store1",
       "credentials": {
         "postgres": {
           "id": "Oxu2Qsukx5UZzuTe",
           "name": "Postgres account"
         }
       }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Usa esta herramienta para obtener información detallada de la empresa",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        2928,
+        -224
+      ],
+      "id": "df7436cb-13e0-4cc0-a616-46188f758850",
+      "name": "RAG",
+      "credentials": {
+        "postgres": {
+          "id": "Oxu2Qsukx5UZzuTe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $json.output }}",
+        "options": {
+          "response_format": "aac"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        4192,
+        208
+      ],
+      "id": "42d47c11-c2ab-4311-89c3-82c022d096ba",
+      "name": "Generate audio",
+      "alwaysOutputData": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "WKoC25ZEGUjONLdV",
+          "name": "OpenAi account Diego"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4f741235-7711-40ac-865f-bd3ca8776a93",
+              "leftValue": "={{ $('Extraer datos importantes').item.json.type }}",
+              "rightValue": "text",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3952,
+        48
+      ],
+      "id": "c2d36e99-3e3d-4d65-ae3a-28bb632e9ce3",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "861953340328352",
+        "recipientPhoneNumber": "={{ $('Extraer datos importantes').item.json.phone_number }}",
+        "messageType": "audio",
+        "mediaPath": "useMedian8n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        4384,
+        208
+      ],
+      "id": "918c0fe6-9fa6-4d97-89a1-10554cf764c2",
+      "name": "Send message",
+      "webhookId": "5816b82a-fcd1-4b41-a3be-462058386139",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "yh2K32GUwyXBekPW",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $json.audio_id }}"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        -32
+      ],
+      "id": "26686a46-5088-49bf-be4a-d1b940550853",
+      "name": "Download media",
+      "webhookId": "dd968ebf-813c-4f07-80cc-a96197649f33",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "yh2K32GUwyXBekPW",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a58b10b8-740d-4b51-bc9d-167995e961a6",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3696,
+        48
+      ],
+      "id": "0b1028a7-3d84-43c3-bf74-7fe68374b3eb",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "861953340328352",
+        "recipientPhoneNumber": "={{ $('Extraer datos importantes').item.json.phone_number }}",
+        "textBody": "={{ $('Edit Fields2').item.json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        4704,
+        32
+      ],
+      "id": "994c8233-da79-45ad-b366-6d3aa57454cb",
+      "name": "Send message1",
+      "webhookId": "89869ec0-f40f-4972-8b22-ec2fc79f2c6a",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "yh2K32GUwyXBekPW",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el item que llega del Webhook\nconst item = $input.first();\nconst binaries = item.binary || {};\nconst keys = Object.keys(binaries);\n\nconst output = [];\n\nfor (const key of keys) {\n  const file = binaries[key];\n  output.push({\n    json: {\n      fileName: file.fileName,\n      mimeType: file.mimeType,\n      size: Buffer.from(file.data, 'base64').length\n    },\n    binary: {\n      data: file\n    }\n  });\n}\n\n// Devolver un item por cada archivo\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        -1200
+      ],
+      "id": "1ff05fb3-a648-42da-aa2a-1d69e7b6bf75",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Describe la imagen de una forma detallada, esta información será usada para alimentar un RAG.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        -1424
+      ],
+      "id": "5f7da915-3875-41a1-a65f-453b8f0cabc3",
+      "name": "Analyze an image",
+      "retryOnFail": true,
+      "waitBetweenTries": 500,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SeCrTTncIM1WuK4g",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c0e939b5-8ca8-489c-a479-e9e77c75341b",
+              "name": "data",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2016,
+        -1424
+      ],
+      "id": "5512e6d0-d187-4a4a-a00b-c6883c0de3f2",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2256,
+        -1424
+      ],
+      "id": "cb22cd4e-26a3-4a99-a4aa-3d749b292a1c",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b895b25f-3a85-4807-8dda-4272a51739b9",
+              "leftValue": "={{ $binary.data.mimeType }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1488,
+        -1200
+      ],
+      "id": "02dced73-3c63-48dc-8302-9c012ecab0d7",
+      "name": "If2"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        3024,
+        -16
+      ],
+      "id": "d42990d0-634b-4a79-9771-a6db7fe214cd",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SeCrTTncIM1WuK4g",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT metadata FROM n8n_vectors;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -112,
+        -1600
+      ],
+      "id": "0d6295eb-b068-44d7-a9e7-d728d7b99e20",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "Oxu2Qsukx5UZzuTe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Crear un Set para evitar duplicados\nconst uniqueFiles = new Set();\n\n// Crear un array con solo file_name, sin duplicados\nconst output = [];\n\nfor (const item of $input.all()) {\n  const fileName = item.json.metadata?.file_name;\n  if (fileName && !uniqueFiles.has(fileName)) {\n    uniqueFiles.add(fileName);\n    output.push({ json: { file_name: fileName } });\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        -1600
+      ],
+      "id": "4f117ada-60b0-4644-a0e4-9a038a1abd8f",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        352,
+        -1600
+      ],
+      "id": "942bf032-54b0-43c5-b5dd-cf1a254d1d81",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "path": "e5d14112-879d-4b4c-9567-dc6c42364154",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        -1600
+      ],
+      "id": "83aed1b0-985b-4e19-9d61-ab51c517b9f7",
+      "name": "Webhook1",
+      "webhookId": "e5d14112-879d-4b4c-9567-dc6c42364154"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "82c0f1c0-8e78-4ccc-aa1f-57d7448d3881",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        1104,
+        -2032
+      ],
+      "id": "940eccf7-4510-4577-a5af-9a5517cb904f",
+      "name": "Webhook2",
+      "webhookId": "82c0f1c0-8e78-4ccc-aa1f-57d7448d3881"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "421e1fbe-499c-4d77-8a6e-d50c37522ebd",
+              "leftValue": "={{ $json.body.doc }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        -2032
+      ],
+      "id": "e76c532d-d7c9-4c5e-9a9c-189188b90c6e",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"No se envió un documento a eliminar\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1536,
+        -1920
+      ],
+      "id": "3c8aad77-8eab-45f6-8d4c-37352422856d",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9ba966f2-ac51-4d33-888c-2224d45f5f45",
+              "name": "doc",
+              "value": "={{ $json.body.doc }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1536,
+        -2128
+      ],
+      "id": "f71bdb7d-c985-4fce-a279-daff63e81c6c",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, metadata FROM n8n_vectors;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1760,
+        -2128
+      ],
+      "id": "626b7dfa-1125-4d60-b571-84127792b534",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "postgres": {
+          "id": "Oxu2Qsukx5UZzuTe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Crear un array con solo file_name, sin duplicados\nconst output = [];\n\nfor (const item of $input.all()) {\n  const fileName = item.json.metadata?.file_name;\n  if (fileName === $('Edit Fields4').first().json.doc) {\n    output.push({ json: { id: item.json.id } });\n  }\n}\n\nreturn output.length !=0 ? output : {result: false};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1968,
+        -2128
+      ],
+      "id": "320699ab-d96e-4c44-a0a6-ef33410ae622",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_vectors",
+          "mode": "list",
+          "cachedResultName": "n8n_vectors"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2432,
+        -2272
+      ],
+      "id": "2deac5ec-a906-46db-a1ee-e8cb80647c47",
+      "name": "Delete table or rows",
+      "credentials": {
+        "postgres": {
+          "id": "Oxu2Qsukx5UZzuTe",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"message\": \"se ha eliminado el archivo\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2912,
+        -2368
+      ],
+      "id": "9d303299-e943-42c9-8b98-4ea34b67d649",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fc08c4d3-a0e5-48e6-a6e8-47a2024a325b",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2624,
+        -2272
+      ],
+      "id": "88069b39-a6b9-40fb-aeaf-7e95e42df5f6",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b35ebb28-75b8-4dfe-a7a7-53c117230119",
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2176,
+        -2128
+      ],
+      "id": "d765d0bd-8983-4eae-a2b5-73e837227041",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"Error interno del servidor\"\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2912,
+        -2192
+      ],
+      "id": "187db960-619a-48ae-a92e-6a46aafe2b1e",
+      "name": "Respond to Webhook3"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"message\": \"El documento no existe\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2384,
+        -2032
+      ],
+      "id": "6aad6ae4-b568-4a52-94e0-79bbe98fb2b6",
+      "name": "Respond to Webhook4"
+    },
+    {
+      "parameters": {
+        "content": "# Workflow para alimentar el RAG",
+        "height": 784,
+        "width": 2144,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        944,
+        -1472
+      ],
+      "typeVersion": 1,
+      "id": "85fa04b6-0b90-472a-ab4b-d994d49c0fa4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Workflow para listar los archivos del RAG",
+        "height": 352,
+        "width": 1072
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -448,
+        -1728
+      ],
+      "typeVersion": 1,
+      "id": "fb63aab7-1568-4100-a94b-422d900f9d3d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Workflow para eliminar archivos del RAG",
+        "height": 672,
+        "width": 2160,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        976,
+        -2400
+      ],
+      "typeVersion": 1,
+      "id": "bbaa83cc-bb12-4e67-82cb-0a6e9af76ad0",
+      "name": "Sticky Note2"
     }
   ],
   "pinData": {},
   "connections": {
-    "Extraer información del audio del mensaje": {
+    "HTTP Request2": {
       "main": [
         [
           {
-            "node": "Extraer audio del mensaje",
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "uptade_lead": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_lead": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Extraer datos importantes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sacar mensaje (text)": {
+      "main": [
+        [
+          {
+            "node": "Set-Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sacar mensaje (voz)": {
+      "main": [
+        [
+          {
+            "node": "Set-Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sacar texto": {
+      "main": [
+        [
+          {
+            "node": "sacar mensaje (voz)",
             "type": "main",
             "index": 0
           }
@@ -587,7 +1442,7 @@
       "main": [
         [
           {
-            "node": "Extraer información del audio del mensaje",
+            "node": "Download media",
             "type": "main",
             "index": 0
           }
@@ -595,61 +1450,6 @@
         [
           {
             "node": "sacar mensaje (text)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Sacar texto": {
-      "main": [
-        [
-          {
-            "node": "sacar mensaje (voz)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Gemini Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "create_contact": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "list_contacts": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Agent": {
-      "main": [
-        [
-          {
-            "node": "Extraer mensaje de respuesta",
             "type": "main",
             "index": 0
           }
@@ -667,23 +1467,89 @@
         ]
       ]
     },
-    "sacar mensaje (voz)": {
+    "Login odoo": {
       "main": [
         [
           {
-            "node": "AI Agent",
+            "node": "Set_Credentials",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "sacar mensaje (text)": {
+    "Set_Credentials": {
       "main": [
         [
           {
-            "node": "AI Agent1",
+            "node": "HTTP Request2",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set-Message": {
+      "main": [
+        [
+          {
+            "node": "Login odoo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -691,102 +1557,341 @@
     },
     "Webhook": {
       "main": [
-        []
-      ]
-    },
-    "update_contact": {
-      "ai_tool": [
         [
           {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "delete_contact": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extraer mensaje de respuesta": {
-      "main": [
-        [
-          {
-            "node": "Enviar mensaje de respuesta",
+            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Enviar mensaje de respuesta": {
-      "main": [
-        []
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Postgres PGVector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAG": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
       ]
     },
     "Generate audio": {
       "main": [
-        []
-      ]
-    },
-    "HTTP Request": {
-      "main": [
         [
           {
-            "node": "Enviar mensaje de respuesta",
+            "node": "Send message",
             "type": "main",
             "index": 0
           }
         ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media": {
+      "main": [
+        [
+          {
+            "node": "Extraer audio del mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store1": {
+      "main": [
+        []
       ]
     },
     "Code in JavaScript": {
       "main": [
         [
           {
-            "node": "Extraer datos importantes",
+            "node": "If2",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Google Gemini Chat Model1": {
-      "ai_languageModel": [
+    "Analyze an image": {
+      "main": [
         [
           {
-            "node": "AI Agent1",
-            "type": "ai_languageModel",
+            "node": "Edit Fields3",
+            "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Create an opportunity in Odoo": {
-      "ai_tool": [
+    "Edit Fields3": {
+      "main": [
         [
           {
-            "node": "AI Agent1",
-            "type": "ai_tool",
+            "node": "Convert to File",
+            "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Postgres Chat Memory": {
-      "ai_memory": [
+    "Convert to File": {
+      "main": [
         [
           {
-            "node": "AI Agent1",
-            "type": "ai_memory",
+            "node": "Postgres PGVector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Postgres PGVector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "RAG",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete table or rows": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Delete table or rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
             "index": 0
           }
         ]
@@ -797,7 +1902,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "fb9b60ca-bbdc-42ce-bff1-c67c8ff0e5af",
+  "versionId": "b50a8b60-5b64-4462-a4c0-a871a5e0ac3a",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "15337ec1d168a7bc1b6cf37959bc4219a27286a5d587a46b9c9571e06d33f863"
