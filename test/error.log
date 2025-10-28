@@ -1,0 +1,2 @@
+{"error":"Connection closed (Error: Connection closed: 320 (CONNECTION-FORCED) with message \"CONNECTION_FORCED - broker forced connection closure with reason 'shutdown'\")","level":"error","message":"❌ Error cerrando conexiones","timestamp":"2025-10-24T18:02:19.046Z"}
+{"error":"Connection closed (Error: Connection closed: 320 (CONNECTION-FORCED) with message \"CONNECTION_FORCED - broker forced connection closure with reason 'shutdown'\")","level":"error","message":"❌ Error cerrando conexiones","timestamp":"2025-10-26T23:22:51.945Z"}

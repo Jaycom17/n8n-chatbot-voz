@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  db:
+    image: pgvector/pgvector:0.6.2-pg15
+    container_name: odoo-db
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+
+  odoo:
+    image: odoo:17
+    container_name: odoo-web
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - ./addons:/mnt/extra-addons
+
+volumes:
+  odoo-db-data:
+  odoo-web-data:
