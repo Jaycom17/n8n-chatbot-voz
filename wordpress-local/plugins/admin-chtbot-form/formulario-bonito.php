@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Formulario Bonito
- * Description: Un formulario elegante hecho a mano por Jaycom 😎 con integración a n8n - Soporta PDFs, DOCX, TXT e imágenes
- * Version: 2.1
+ * Description: Un formulario elegante hecho a mano por Jaycom 😎 con integración a n8n - Soporta PDFs, DOCX, TXT e imágenes. Incluye gestión de documentos RAG.
+ * Version: 2.2
  * Author: Camilo Orejuela
  */
 
@@ -22,6 +22,16 @@ function fb_agregar_menu_admin() {
         'fb_pagina_configuracion',
         'dashicons-admin-generic',
         100
+    );
+    
+    // Agregar submenú para gestión de documentos
+    add_submenu_page(
+        'formulario-bonito-config',
+        'Gestión de Documentos',
+        '📄 Documentos RAG',
+        'manage_options',
+        'formulario-bonito-documentos',
+        'fb_pagina_documentos'
     );
 }
 add_action('admin_menu', 'fb_agregar_menu_admin');
@@ -72,6 +82,28 @@ function fb_pagina_configuracion() {
                         </p>
                     </td>
                 </tr>
+                <tr valign="top">
+                    <th scope="row">📋 Webhook URL Listar Documentos (GET)</th>
+                    <td>
+                        <input type="url" name="fb_webhook_list_url" value="<?php echo esc_attr(get_option('fb_webhook_list_url')); ?>" class="regular-text" placeholder="https://tu-n8n.com/webhook/list-rag-documents" />
+                        <p class="description">
+                            <strong>Qué es:</strong> La URL del webhook que devuelve la lista de documentos del RAG.<br>
+                            <strong>Método:</strong> GET<br>
+                            <strong>Respuesta esperada:</strong> <code>[{"file_name": "documento.pdf"}]</code>
+                        </p>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">🗑️ Webhook URL Eliminar Documentos (DELETE)</th>
+                    <td>
+                        <input type="url" name="fb_webhook_delete_url" value="<?php echo esc_attr(get_option('fb_webhook_delete_url')); ?>" class="regular-text" placeholder="https://tu-n8n.com/webhook/delete-rag-document" />
+                        <p class="description">
+                            <strong>Qué es:</strong> La URL del webhook para eliminar documentos del RAG.<br>
+                            <strong>Método:</strong> DELETE<br>
+                            <strong>Body requerido:</strong> <code>{"file_name": "documento.pdf"}</code>
+                        </p>
+                    </td>
+                </tr>
             </table>
             
             <div style="background: #f0f6fc; border-left: 4px solid #0073aa; padding: 15px; margin: 20px 0;">
@@ -88,8 +120,164 @@ function fb_pagina_configuracion() {
 function fb_registrar_configuraciones() {
     register_setting('fb_config_group', 'fb_jwt_secret');
     register_setting('fb_config_group', 'fb_webhook_url');
+    register_setting('fb_config_group', 'fb_webhook_list_url');
+    register_setting('fb_config_group', 'fb_webhook_delete_url');
 }
 add_action('admin_init', 'fb_registrar_configuraciones');
+
+// Página de gestión de documentos
+function fb_pagina_documentos() {
+    ?>
+    <div class="wrap">
+        <h1>📄 Gestión de Documentos RAG</h1>
+        
+        <div style="background: #fff; border-left: 4px solid #00a32a; padding: 15px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0;">ℹ️ Acerca de esta sección</h3>
+            <p>Aquí puedes ver todos los documentos que están actualmente almacenados en tu sistema RAG y eliminar aquellos que ya no necesites.</p>
+            <p><strong>Funciones disponibles:</strong></p>
+            <ul>
+                <li><strong>Listar documentos:</strong> Ver todos los archivos almacenados en el RAG</li>
+                <li><strong>Eliminar documentos:</strong> Borrar documentos específicos del sistema</li>
+            </ul>
+        </div>
+
+        <button id="fb-refresh-docs" class="button button-primary" style="margin-bottom: 20px;">
+            🔄 Actualizar Lista
+        </button>
+        
+        <div id="fb-documentos-container">
+            <p>Cargando documentos...</p>
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+    jQuery(document).ready(function($) {
+        // Función para cargar documentos
+        function cargarDocumentos() {
+            $('#fb-documentos-container').html('<p>⏳ Cargando documentos...</p>');
+            
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'fb_listar_documentos'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#fb-documentos-container').html(response.data.html);
+                    } else {
+                        $('#fb-documentos-container').html('<div class="notice notice-error"><p>❌ ' + response.data + '</p></div>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#fb-documentos-container').html('<div class="notice notice-error"><p>❌ Error al cargar documentos: ' + error + '</p></div>');
+                }
+            });
+        }
+        
+        // Cargar documentos al inicio
+        cargarDocumentos();
+        
+        // Botón de refrescar
+        $('#fb-refresh-docs').on('click', function() {
+            cargarDocumentos();
+        });
+        
+        // Función para eliminar documento (delegada)
+        $(document).on('click', '.fb-delete-doc', function() {
+            var fileName = $(this).data('filename');
+            var $button = $(this);
+            
+            if (!confirm('¿Estás seguro de que deseas eliminar "' + fileName + '"?\n\nEsta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            $button.prop('disabled', true).text('⏳ Eliminando...');
+            
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'fb_eliminar_documento',
+                    file_name: fileName
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert('✅ ' + response.data);
+                        cargarDocumentos(); // Recargar la lista
+                    } else {
+                        alert('❌ ' + response.data);
+                        $button.prop('disabled', false).text('🗑️ Eliminar');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('❌ Error al eliminar el documento: ' + error);
+                    $button.prop('disabled', false).text('🗑️ Eliminar');
+                }
+            });
+        });
+    });
+    </script>
+    
+    <style>
+    .fb-docs-table {
+        width: 100%;
+        background: #fff;
+        border-collapse: collapse;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .fb-docs-table th {
+        background: #f0f0f1;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid #c3c4c7;
+    }
+    
+    .fb-docs-table td {
+        padding: 12px;
+        border-bottom: 1px solid #dcdcde;
+    }
+    
+    .fb-docs-table tr:hover {
+        background: #f6f7f7;
+    }
+    
+    .fb-delete-doc {
+        background: #d63638;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        cursor: pointer;
+        border-radius: 3px;
+        font-size: 13px;
+    }
+    
+    .fb-delete-doc:hover {
+        background: #b32d2e;
+    }
+    
+    .fb-delete-doc:disabled {
+        background: #c3c4c7;
+        cursor: not-allowed;
+    }
+    
+    .fb-no-docs {
+        padding: 40px;
+        text-align: center;
+        background: #fff;
+        border: 1px solid #dcdcde;
+        border-radius: 4px;
+    }
+    
+    .fb-no-docs-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+    </style>
+    <?php
+}
 
 // ============================================
 // FUNCIONES JWT
@@ -181,45 +369,131 @@ function fb_generar_jwt() {
 // SHORTCODE Y FORMULARIO
 // ============================================
 
-// Registrar shortcode para mostrar el formulario
+// Registrar shortcode para mostrar el formulario CON gestión de documentos
 function fb_mostrar_formulario() {
     ob_start();
     ?>
-    <form id="fb-form" class="fb-form" enctype="multipart/form-data">
-        <h2>📤 Subir Archivos al RAG</h2>
-        
-        <div class="fb-group">
-            <label for="archivos">Selecciona los archivos a procesar</label>
-            <input type="file" id="archivos" name="archivos[]" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg" required>
-            <p class="description">Puedes seleccionar múltiples archivos. Formatos aceptados: PDF, DOCX, TXT e imágenes (JPG, PNG, GIF, etc.).</p>
+    <div class="fb-contenedor-principal">
+        <!-- HEADER DEL PLUGIN -->
+        <div class="fb-header">
+            <div class="fb-header-content">
+                <h1 class="fb-header-title">
+                    <span class="fb-icon">📚</span>
+                    Sistema de Gestión RAG
+                </h1>
+                <p class="fb-header-subtitle">Administra tus documentos de forma inteligente</p>
+            </div>
         </div>
 
-        <div class="fb-privacy-notice">
-            <h4>🔒 Información sobre Privacidad y Tratamiento de Datos</h4>
-            <p><strong>⚠️ IMPORTANTE - Lee antes de enviar:</strong></p>
-            <ul>
-                <li><strong>Contenido de los archivos:</strong> Todo el contenido de los archivos que subas (texto, imágenes, información, datos) será procesado y almacenado en el sistema RAG (Retrieval-Augmented Generation).</li>
-                <li><strong>⚠️ NO envíes datos personales sensibles:</strong> Evita subir archivos que contengan información personal sensible como números de identificación, datos bancarios, contraseñas, información médica confidencial o cualquier dato que no desees que sea procesado.</li>
-                <li><strong>Uso del contenido:</strong> El contenido de los archivos será utilizado para entrenar y mejorar el sistema de inteligencia artificial, generación de respuestas y contenido contextual.</li>
-                <li><strong>Análisis automático:</strong> Los archivos serán analizados automáticamente para extraer texto, entidades, conceptos y relaciones que alimentarán la base de conocimiento del sistema.</li>
-                <li><strong>Seguridad:</strong> La transmisión se realiza mediante conexión segura con autenticación JWT.</li>
-            </ul>
-            <p style="font-size: 13px; color: #d63638; font-weight: 600; margin-top: 15px; padding: 10px; background: #fff8e5; border-left: 4px solid #d63638;">
-                ⚠️ Al hacer clic en "Enviar archivos", confirmas que:<br>
-                • Has leído y comprendes esta política<br>
-                • El contenido de los archivos NO contiene datos personales sensibles<br>
-                • Autorizas el procesamiento del contenido para alimentar el sistema RAG
-            </p>
+        <!-- SISTEMA DE PESTAÑAS -->
+        <div class="fb-tabs-container">
+            <div class="fb-tabs-header">
+                <button class="fb-tab-btn active" data-tab="upload">
+                    <span class="fb-tab-icon">📤</span>
+                    Subir Archivos
+                </button>
+                <button class="fb-tab-btn" data-tab="manage">
+                    <span class="fb-tab-icon">📂</span>
+                    Mis Documentos
+                    <span class="fb-tab-badge" id="fb-docs-count">0</span>
+                </button>
+            </div>
+
+            <div class="fb-tabs-content">
+                <!-- TAB: SUBIR ARCHIVOS -->
+                <div class="fb-tab-panel active" id="tab-upload">
+                    <div class="fb-card">
+                        <div class="fb-card-header">
+                            <h2 class="fb-card-title">📤 Subir Nuevos Documentos</h2>
+                            <p class="fb-card-description">Selecciona uno o más archivos para agregar al sistema RAG</p>
+                        </div>
+                        
+                        <div class="fb-card-body">
+                            <form id="fb-form" class="fb-form" enctype="multipart/form-data">
+                                <div class="fb-upload-area">
+                                    <div class="fb-upload-icon">📄</div>
+                                    <div class="fb-upload-text">
+                                        <label for="archivos" class="fb-upload-label">
+                                            <strong>Haz clic para seleccionar archivos</strong>
+                                            <span>o arrastra y suelta aquí</span>
+                                        </label>
+                                        <input type="file" id="archivos" name="archivos[]" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                                    </div>
+                                    <p class="fb-upload-formats">
+                                        <strong>Formatos aceptados:</strong> PDF, DOCX, TXT, JPG, PNG
+                                    </p>
+                                </div>
+
+                                <div class="fb-selected-files" id="fb-selected-files" style="display:none;">
+                                    <h4>0 archivos seleccionados</h4>
+                                    <ul id="fb-files-list"></ul>
+                                </div>
+
+                                <div class="fb-collapsible-section">
+                                    <button type="button" class="fb-collapsible-trigger">
+                                        🔒 Política de Privacidad y Tratamiento de Datos
+                                        <span class="fb-collapsible-arrow">▼</span>
+                                    </button>
+                                    <div class="fb-collapsible-content">
+                                        <div class="fb-privacy-notice">
+                                            <p><strong>⚠️ IMPORTANTE - Lee antes de enviar:</strong></p>
+                                            <ul>
+                                                <li><strong>Contenido de los archivos:</strong> Todo el contenido será procesado y almacenado en el sistema RAG.</li>
+                                                <li><strong>⚠️ NO envíes datos sensibles:</strong> Evita información personal como IDs, datos bancarios, contraseñas o información médica.</li>
+                                                <li><strong>Uso del contenido:</strong> Los archivos serán utilizados para entrenar y mejorar el sistema de IA.</li>
+                                                <li><strong>Análisis automático:</strong> Se extraerá texto, entidades y relaciones automáticamente.</li>
+                                                <li><strong>Seguridad:</strong> Transmisión segura con autenticación JWT.</li>
+                                            </ul>
+                                            <div class="fb-privacy-alert">
+                                                ⚠️ Al enviar archivos, confirmas que has leído esta política y que el contenido NO contiene datos personales sensibles.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="fb-btn fb-btn-primary">
+                                    <span class="fb-btn-icon">📤</span>
+                                    Enviar Archivos
+                                </button>
+                                
+                                <div id="fb-respuesta"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: MIS DOCUMENTOS -->
+                <div class="fb-tab-panel" id="tab-manage">
+                    <div class="fb-card">
+                        <div class="fb-card-header">
+                            <h2 class="fb-card-title">📂 Documentos Almacenados</h2>
+                            <p class="fb-card-description">Visualiza y administra tus documentos en el sistema RAG</p>
+                        </div>
+                        
+                        <div class="fb-card-body">
+                            <div class="fb-toolbar">
+                                <button id="fb-refresh-docs" class="fb-btn fb-btn-secondary">
+                                    <span class="fb-btn-icon">🔄</span>
+                                    Actualizar Lista
+                                </button>
+                            </div>
+                            
+                            <div id="fb-documentos-container">
+                                <div class="fb-loading-state">
+                                    <div class="fb-spinner"></div>
+                                    <p>Cargando documentos...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <button type="submit" class="fb-btn">📤 Enviar Archivos</button>
-        <div id="fb-respuesta"></div>
-    </form>
+    </div>
     <?php
     return ob_get_clean();
 }
 add_shortcode('formulario_bonito', 'fb_mostrar_formulario');
-
 
 // Agregar estilos
 function fb_agregar_estilos() {
@@ -244,7 +518,7 @@ function fb_enviar_formulario() {
     }
     
     // Definir extensiones permitidas
-    $extensiones_permitidas = ['pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+    $extensiones_permitidas = ['pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png'];
     
     // Validar extensiones de archivos
     $files = $_FILES['archivos'];
@@ -255,7 +529,7 @@ function fb_enviar_formulario() {
         $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
         
         if (!in_array($extension, $extensiones_permitidas)) {
-            wp_send_json_error('❌ El archivo "' . $file_name . '" no es válido. Solo se permiten: PDF, DOC, DOCX, TXT e imágenes (JPG, PNG, GIF, BMP, WEBP, SVG).');
+            wp_send_json_error('❌ El archivo "' . $file_name . '" no es válido. Solo se permiten: PDF, DOCX, TXT, JPG, PNG.');
             return;
         }
     }
@@ -430,4 +704,191 @@ function fb_enviar_formulario() {
 }
 add_action('wp_ajax_fb_enviar_formulario', 'fb_enviar_formulario');
 add_action('wp_ajax_nopriv_fb_enviar_formulario', 'fb_enviar_formulario');
+
+// ============================================
+// GESTIÓN DE DOCUMENTOS - LISTAR
+// ============================================
+
+function fb_listar_documentos() {
+    // Nota: Permitimos acceso sin verificar permisos para que funcione en frontend
+    // Si quieres restringir, descomenta la siguiente línea:
+    // if (!is_user_logged_in()) {
+    //     wp_send_json_error('Debes iniciar sesión para ver los documentos.');
+    //     return;
+    // }
+    
+    // Obtener configuración
+    $webhook_list_url = get_option('fb_webhook_list_url', '');
+    
+    if (empty($webhook_list_url)) {
+        wp_send_json_error('La URL del webhook de listado no está configurada. Por favor configúrala en la página de configuración.');
+        return;
+    }
+    
+    // Generar JWT
+    $jwt = fb_generar_jwt();
+    
+    if (!$jwt) {
+        wp_send_json_error('Sistema de autenticación no configurado. Por favor configura el JWT Secret.');
+        return;
+    }
+    
+    // Hacer petición GET al webhook
+    $response = wp_remote_get($webhook_list_url, [
+        'timeout' => 30,
+        'headers' => [
+            'Authorization' => 'Bearer ' . $jwt
+        ]
+    ]);
+    
+    if (is_wp_error($response)) {
+        $error_message = $response->get_error_message();
+        wp_send_json_error('Error al conectar con el webhook: ' . $error_message);
+        return;
+    }
+    
+    $response_code = wp_remote_retrieve_response_code($response);
+    $response_body = wp_remote_retrieve_body($response);
+    
+    if ($response_code >= 200 && $response_code < 300) {
+        $documentos = json_decode($response_body, true);
+        
+        if (!is_array($documentos)) {
+            wp_send_json_error('Respuesta inválida del webhook. Se esperaba un array JSON.');
+            return;
+        }
+        
+        // Generar HTML de la tabla
+        $html = '';
+        
+        if (empty($documentos)) {
+            $html = '<div class="fb-no-docs">
+                        <div class="fb-no-docs-icon">📭</div>
+                        <h2>No hay documentos</h2>
+                        <p>Aún no se han subido documentos al sistema RAG.</p>
+                    </div>';
+        } else {
+            $html = '<table class="fb-docs-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>📄 Nombre del Archivo</th>
+                                <th style="width: 150px; text-align: center;">🛠️ Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>';
+            
+            $contador = 1;
+            foreach ($documentos as $doc) {
+                $file_name = isset($doc['file_name']) ? esc_html($doc['file_name']) : 'Sin nombre';
+                $file_name_attr = isset($doc['file_name']) ? esc_attr($doc['file_name']) : '';
+                
+                $html .= '<tr>
+                            <td>' . $contador . '</td>
+                            <td><strong>' . $file_name . '</strong></td>
+                            <td style="text-align: center;">
+                                <button class="fb-delete-doc" data-filename="' . $file_name_attr . '">
+                                    🗑️ Eliminar
+                                </button>
+                            </td>
+                          </tr>';
+                $contador++;
+            }
+            
+            $html .= '</tbody></table>';
+            $html .= '<p style="margin-top: 15px; color: #666;">Total de documentos: <strong>' . count($documentos) . '</strong></p>';
+        }
+        
+        wp_send_json_success([
+            'html' => $html,
+            'count' => count($documentos)
+        ]);
+    } else {
+        if ($response_code == 401 || $response_code == 403) {
+            wp_send_json_error('Error de autenticación. Verifica que el JWT Secret sea correcto.');
+        } elseif ($response_code == 404) {
+            wp_send_json_error('Webhook no encontrado (404). Verifica que la URL sea correcta.');
+        } else {
+            wp_send_json_error('Error del servidor: código ' . $response_code . ' - ' . $response_body);
+        }
+    }
+}
+add_action('wp_ajax_fb_listar_documentos', 'fb_listar_documentos');
+add_action('wp_ajax_nopriv_fb_listar_documentos', 'fb_listar_documentos');
+
+// ============================================
+// GESTIÓN DE DOCUMENTOS - ELIMINAR
+// ============================================
+
+function fb_eliminar_documento() {
+    // Nota: Permitimos acceso sin verificar permisos para que funcione en frontend
+    // Si quieres restringir, descomenta la siguiente línea:
+    // if (!is_user_logged_in()) {
+    //     wp_send_json_error('Debes iniciar sesión para eliminar documentos.');
+    //     return;
+    // }
+    
+    // Obtener el nombre del archivo
+    $file_name = isset($_POST['file_name']) ? sanitize_text_field($_POST['file_name']) : '';
+    
+    if (empty($file_name)) {
+        wp_send_json_error('No se especificó el nombre del archivo.');
+        return;
+    }
+    
+    // Obtener configuración
+    $webhook_delete_url = get_option('fb_webhook_delete_url', '');
+    
+    if (empty($webhook_delete_url)) {
+        wp_send_json_error('La URL del webhook de eliminación no está configurada. Por favor configúrala en la página de configuración.');
+        return;
+    }
+    
+    // Generar JWT
+    $jwt = fb_generar_jwt();
+    
+    if (!$jwt) {
+        wp_send_json_error('Sistema de autenticación no configurado. Por favor configura el JWT Secret.');
+        return;
+    }
+    
+    // Preparar el body JSON
+    $body = json_encode([
+        'doc' => $file_name
+    ]);
+    
+    // Hacer petición DELETE al webhook
+    $response = wp_remote_request($webhook_delete_url, [
+        'method' => 'DELETE',
+        'timeout' => 30,
+        'headers' => [
+            'Authorization' => 'Bearer ' . $jwt,
+            'Content-Type' => 'application/json'
+        ],
+        'body' => $body
+    ]);
+    
+    if (is_wp_error($response)) {
+        $error_message = $response->get_error_message();
+        wp_send_json_error('Error al conectar con el webhook: ' . $error_message);
+        return;
+    }
+    
+    $response_code = wp_remote_retrieve_response_code($response);
+    $response_body = wp_remote_retrieve_body($response);
+    
+    if ($response_code >= 200 && $response_code < 300) {
+        wp_send_json_success('Documento "' . $file_name . '" eliminado correctamente.');
+    } else {
+        if ($response_code == 401 || $response_code == 403) {
+            wp_send_json_error('Error de autenticación. Verifica que el JWT Secret sea correcto.');
+        } elseif ($response_code == 404) {
+            wp_send_json_error('Documento no encontrado o webhook no disponible.');
+        } else {
+            wp_send_json_error('Error del servidor: código ' . $response_code . ' - ' . $response_body);
+        }
+    }
+}
+add_action('wp_ajax_fb_eliminar_documento', 'fb_eliminar_documento');
+add_action('wp_ajax_nopriv_fb_eliminar_documento', 'fb_eliminar_documento');
 

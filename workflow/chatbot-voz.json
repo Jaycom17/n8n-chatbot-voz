@@ -579,8 +579,8 @@
       "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
       "typeVersion": 1,
       "position": [
-        2784,
-        -832
+        2736,
+        -816
       ],
       "id": "d3ac86f6-d5fd-4614-bb9a-e856516819a5",
       "name": "Recursive Character Text Splitter"
@@ -936,11 +936,14 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -112,
-        -1600
+        -128,
+        -1488
       ],
       "id": "0d6295eb-b068-44d7-a9e7-d728d7b99e20",
       "name": "Execute a SQL query",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 500,
       "credentials": {
         "postgres": {
           "id": "Oxu2Qsukx5UZzuTe",
@@ -950,16 +953,17 @@
     },
     {
       "parameters": {
-        "jsCode": "// Crear un Set para evitar duplicados\nconst uniqueFiles = new Set();\n\n// Crear un array con solo file_name, sin duplicados\nconst output = [];\n\nfor (const item of $input.all()) {\n  const fileName = item.json.metadata?.file_name;\n  if (fileName && !uniqueFiles.has(fileName)) {\n    uniqueFiles.add(fileName);\n    output.push({ json: { file_name: fileName } });\n  }\n}\n\nreturn output;\n"
+        "jsCode": "// Crear un Set para evitar duplicados\nconst uniqueFiles = new Set();\n\n// Crear un array con solo file_name, sin duplicados\nconst output = [];\n\nfor (const item of $input.all()) {\n  const fileName = item.json.metadata?.file_name;\n  if (fileName && !uniqueFiles.has(fileName)) {\n    uniqueFiles.add(fileName);\n    output.push({ json: { file_name: fileName } });\n  }\n}\n\nreturn output.length > 0 ? output : {data: false};\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         112,
-        -1600
+        -1488
       ],
       "id": "4f117ada-60b0-4644-a0e4-9a038a1abd8f",
-      "name": "Code in JavaScript1"
+      "name": "Code in JavaScript1",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -969,11 +973,12 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        352,
-        -1600
+        528,
+        -1632
       ],
       "id": "942bf032-54b0-43c5-b5dd-cf1a254d1d81",
-      "name": "Respond to Webhook"
+      "name": "Respond to Webhook",
+      "alwaysOutputData": false
     },
     {
       "parameters": {
@@ -984,8 +989,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -336,
-        -1600
+        -368,
+        -1488
       ],
       "id": "83aed1b0-985b-4e19-9d61-ab51c517b9f7",
       "name": "Webhook1",
@@ -993,7 +998,7 @@
     },
     {
       "parameters": {
-        "httpMethod": "POST",
+        "httpMethod": "DELETE",
         "path": "82c0f1c0-8e78-4ccc-aa1f-57d7448d3881",
         "responseMode": "responseNode",
         "options": {}
@@ -1290,13 +1295,13 @@
     {
       "parameters": {
         "content": "# Workflow para listar los archivos del RAG",
-        "height": 352,
-        "width": 1072
+        "height": 624,
+        "width": 1184
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -448,
-        -1728
+        -432,
+        -1760
       ],
       "typeVersion": 1,
       "id": "fb63aab7-1568-4100-a94b-422d900f9d3d",
@@ -1317,6 +1322,55 @@
       "typeVersion": 1,
       "id": "bbaa83cc-bb12-4e67-82cb-0a6e9af76ad0",
       "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "28123be3-bf0f-443d-8ed8-df90c3b6b0cc",
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        -1488
+      ],
+      "id": "f845a9c0-2999-42c6-8e64-d20d1be34630",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "[]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        528,
+        -1392
+      ],
+      "id": "34044a52-0d6f-4e94-b5c6-f5def1f27512",
+      "name": "Respond to Webhook5"
     }
   ],
   "pinData": {},
@@ -1765,7 +1819,7 @@
       "main": [
         [
           {
-            "node": "Respond to Webhook",
+            "node": "If6",
             "type": "main",
             "index": 0
           }
@@ -1896,13 +1950,31 @@
           }
         ]
       ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "b50a8b60-5b64-4462-a4c0-a871a5e0ac3a",
+  "versionId": "a52ee860-0fa4-4a6b-bda9-8d853d49a520",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "15337ec1d168a7bc1b6cf37959bc4219a27286a5d587a46b9c9571e06d33f863"
