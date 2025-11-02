@@ -1,2 +1,3 @@
 {"error":"Connection closed (Error: Connection closed: 320 (CONNECTION-FORCED) with message \"CONNECTION_FORCED - broker forced connection closure with reason 'shutdown'\")","level":"error","message":"❌ Error cerrando conexiones","timestamp":"2025-10-24T18:02:19.046Z"}
 {"error":"Connection closed (Error: Connection closed: 320 (CONNECTION-FORCED) with message \"CONNECTION_FORCED - broker forced connection closure with reason 'shutdown'\")","level":"error","message":"❌ Error cerrando conexiones","timestamp":"2025-10-26T23:22:51.945Z"}
+{"error":"connect ECONNREFUSED 127.0.0.1:5672","level":"error","message":"❌ Error conectando a RabbitMQ, reintentando en 5s...","timestamp":"2025-11-02T17:18:32.952Z"}

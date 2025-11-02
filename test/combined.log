@@ -37,3 +37,31 @@
 {"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-10-26T23:22:49.034Z"}
 {"level":"warn","message":"⚠️ Conexión con RabbitMQ cerrada, reconectando...","timestamp":"2025-10-26T23:22:49.034Z"}
 {"level":"info","message":"🛑 Señal SIGINT recibida, cerrando servidor...","timestamp":"2025-10-26T23:22:51.945Z"}
+{"error":"connect ECONNREFUSED 127.0.0.1:5672","level":"error","message":"❌ Error conectando a RabbitMQ, reintentando en 5s...","timestamp":"2025-11-02T17:18:32.952Z"}
+{"level":"info","message":"🛑 Señal SIGINT recibida, cerrando servidor...","timestamp":"2025-11-02T17:18:37.138Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T17:19:37.402Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T17:19:37.406Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T17:19:37.406Z"}
+{"level":"info","message":"✅ Mensaje enviado a RabbitMQ [object Object]","timestamp":"2025-11-02T17:21:37.182Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T17:24:25.824Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T17:24:25.827Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T17:24:26.089Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T17:24:26.092Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T17:24:26.092Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T17:24:35.410Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T17:24:35.412Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T17:24:35.649Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T17:24:35.652Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T17:24:35.652Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T17:24:46.556Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T17:24:46.559Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T17:24:46.809Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T17:24:46.812Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T17:24:46.813Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T17:30:56.592Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T17:30:56.594Z"}
+{"level":"info","message":"✅ Channel de RabbitMQ cerrado","timestamp":"2025-11-02T17:30:56.595Z"}
+{"level":"warn","message":"⚠️ Conexión con RabbitMQ cerrada, reconectando...","timestamp":"2025-11-02T17:30:56.598Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T17:30:56.916Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T17:30:56.919Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T17:30:56.919Z"}

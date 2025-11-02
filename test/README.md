@@ -1,6 +1,6 @@
 # 🚀 WhatsApp to RabbitMQ Webhook
 
-Servicio robusto para recibir mensajes de la API de WhatsApp Business y reenviarlos a RabbitMQ con manejo completo de errores y reintentos.
+Servicio robusto para recibir mensajes de la API de WhatsApp Business y reenviarlos a RabbitMQ con manejo completo de errores, reintentos y **seguridad mediante validación de firma**.
 
 ## ✨ Características
 
@@ -14,6 +14,8 @@ Servicio robusto para recibir mensajes de la API de WhatsApp Business y reenviar
 - ✅ **Variables de entorno** para configuración segura
 - ✅ **Manejo de errores** en connection y channel
 - ✅ **Soporte para mensajes** de texto y audio
+- 🔒 **Validación de firma HMAC SHA256** - Solo procesa peticiones de WhatsApp
+- 🏗️ **Arquitectura por capas** - Código organizado y mantenible
 
 ## 🔧 Configuración
 

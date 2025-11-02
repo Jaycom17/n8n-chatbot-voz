@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --watch src/index.js"
+    "start": "node --watch src/index.js",
+    "test:signature": "node test-signature.js"
   },
   "keywords": [],
   "author": "",
