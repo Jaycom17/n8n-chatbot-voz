@@ -2,6 +2,14 @@
  * Configuración centralizada de la aplicación
  * Todas las variables de entorno y constantes se definen aquí
  */
+// Cargar variables de entorno desde .env
+const fs = require('fs');
+if (fs.existsSync('.env')) {
+  require('dotenv').config();
+  console.log('📄 Dotenv: Cargando desde archivo .env');
+} else {
+  console.log('🐳 Docker: Usando variables de entorno del sistema');
+}
 
 export const config = {
   // RabbitMQ
@@ -16,7 +24,7 @@ export const config = {
   webhookVerifyToken: process.env.WEBHOOK_VERIFY_TOKEN || "mi_token_secreto_123",
   
   // WhatsApp Security
-  whatsappAppSecret: process.env.WHATSAPP_APP_SECRET, // REQUERIDO para validación de firma
+  whatsappAppSecret: process.env.WHATSAPP_APP_SECRET,
   
   // Reintentos
   maxRetries: 3,

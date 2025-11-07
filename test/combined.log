@@ -65,3 +65,115 @@
 {"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T17:30:56.916Z"}
 {"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T17:30:56.919Z"}
 {"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T17:30:56.919Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:20:45.245Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:20:45.248Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:20:45.248Z"}
+{"level":"warn","message":"⚠️ Petición rechazada: falta el header X-Hub-Signature-256","timestamp":"2025-11-02T19:21:36.053Z"}
+{"level":"warn","message":"⚠️ Petición rechazada: falta el header X-Hub-Signature-256","timestamp":"2025-11-02T19:21:42.484Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:22:07.608Z"}
+{"level":"warn","message":"⚠️ Conexión con RabbitMQ cerrada, reconectando...","timestamp":"2025-11-02T19:22:07.608Z"}
+{"error":"read ECONNRESET","level":"error","message":"❌ Error conectando a RabbitMQ, reintentando en 5s...","timestamp":"2025-11-02T19:22:12.615Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:22:17.665Z"}
+{"level":"warn","message":"⚠️ Petición rechazada: falta el header X-Hub-Signature-256","timestamp":"2025-11-02T19:22:24.185Z"}
+{"level":"error","message":"❌ ERROR DE CONFIGURACIÓN: WHATSAPP_APP_SECRET no está configurado","timestamp":"2025-11-02T19:22:39.323Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:23:09.173Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:23:09.175Z"}
+{"level":"info","message":"✅ Channel de RabbitMQ cerrado","timestamp":"2025-11-02T19:23:09.175Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:23:09.388Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:23:09.390Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:23:09.391Z"}
+{"level":"info","message":"🛑 Señal SIGINT recibida, cerrando servidor...","timestamp":"2025-11-02T19:24:41.831Z"}
+{"level":"info","message":"🛑 Señal SIGINT recibida, cerrando servidor...","timestamp":"2025-11-02T19:24:41.833Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:24:43.787Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:24:43.789Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:24:43.790Z"}
+{"level":"error","message":"❌ ERROR DE CONFIGURACIÓN: WHATSAPP_APP_SECRET no está configurado","timestamp":"2025-11-02T19:24:48.578Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:25:29.657Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:25:29.659Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:25:29.880Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:25:29.882Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:25:29.883Z"}
+{"level":"error","message":"❌ ERROR DE CONFIGURACIÓN: WHATSAPP_APP_SECRET no está configurado","timestamp":"2025-11-02T19:25:34.656Z"}
+{"level":"info","message":"🛑 Señal SIGINT recibida, cerrando servidor...","timestamp":"2025-11-02T19:27:55.203Z"}
+{"level":"info","message":"🛑 Señal SIGINT recibida, cerrando servidor...","timestamp":"2025-11-02T19:27:55.205Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:29:22.848Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:29:22.851Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:29:22.851Z"}
+{"level":"info","message":"✅ Firma de WhatsApp validada correctamente","timestamp":"2025-11-02T19:29:37.149Z"}
+{"level":"warn","message":"⚠️ No se encontró el objeto 'value' en el mensaje","timestamp":"2025-11-02T19:29:37.149Z"}
+{"level":"warn","message":"⚠️ Mensaje no válido recibido","timestamp":"2025-11-02T19:29:37.150Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:31:25.544Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:31:25.546Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:31:25.807Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:31:25.810Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:31:25.811Z"}
+{"level":"info","message":"✅ Firma de WhatsApp validada correctamente","timestamp":"2025-11-02T19:32:21.502Z"}
+{"level":"warn","message":"⚠️ No se encontró el objeto 'value' en el mensaje","timestamp":"2025-11-02T19:32:21.502Z"}
+{"level":"warn","message":"⚠️ Mensaje no válido recibido","timestamp":"2025-11-02T19:32:21.502Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:32:50.933Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:32:50.935Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:32:51.166Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:32:51.169Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:32:51.169Z"}
+{"level":"info","message":"✅ Firma de WhatsApp validada correctamente","timestamp":"2025-11-02T19:32:59.165Z"}
+{"level":"warn","message":"⚠️ No se encontró el objeto 'value' en el mensaje","timestamp":"2025-11-02T19:32:59.165Z"}
+{"level":"warn","message":"⚠️ Mensaje no válido recibido","timestamp":"2025-11-02T19:32:59.165Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:33:05.075Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:33:05.078Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:33:05.306Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:33:05.309Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:33:05.310Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:34:09.480Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:34:09.482Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:34:09.715Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:34:09.718Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:34:09.718Z"}
+{"level":"info","message":"✅ Firma de WhatsApp validada correctamente","timestamp":"2025-11-02T19:34:13.494Z"}
+{"level":"warn","message":"⚠️ No se encontró el objeto 'value' en el mensaje","timestamp":"2025-11-02T19:34:13.494Z"}
+{"level":"warn","message":"⚠️ Mensaje no válido recibido","timestamp":"2025-11-02T19:34:13.494Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:34:17.013Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:34:17.015Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:34:17.239Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:34:17.242Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:34:17.242Z"}
+{"level":"info","message":"✅ Firma de WhatsApp validada correctamente","timestamp":"2025-11-02T19:34:20.100Z"}
+{"level":"warn","message":"⚠️ No se encontró el objeto 'value' en el mensaje","timestamp":"2025-11-02T19:34:20.104Z"}
+{"level":"warn","message":"⚠️ Mensaje no válido recibido","timestamp":"2025-11-02T19:34:20.104Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:36:29.599Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:36:29.601Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:36:29.825Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:36:29.828Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:36:29.828Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:44:05.902Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:44:05.905Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:44:06.145Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:44:06.148Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:44:06.149Z"}
+{"level":"info","message":"✅ Firma de WhatsApp validada correctamente","timestamp":"2025-11-02T19:44:19.602Z"}
+{"level":"warn","message":"⚠️ No se encontró el objeto 'value' en el mensaje","timestamp":"2025-11-02T19:44:19.603Z"}
+{"level":"warn","message":"⚠️ Mensaje no válido recibido","timestamp":"2025-11-02T19:44:19.603Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:44:42.002Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:44:42.006Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:44:42.271Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:44:42.275Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:44:42.275Z"}
+{"level":"info","message":"✅ Firma de WhatsApp validada correctamente","timestamp":"2025-11-02T19:44:48.915Z"}
+{"level":"warn","message":"⚠️ No se encontró el objeto 'value' en el mensaje","timestamp":"2025-11-02T19:44:48.916Z"}
+{"level":"warn","message":"⚠️ Mensaje no válido recibido","timestamp":"2025-11-02T19:44:48.916Z"}
+{"level":"info","message":"🛑 Señal SIGTERM recibida, cerrando servidor...","timestamp":"2025-11-02T19:49:01.934Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:49:01.937Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:49:02.177Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:49:02.180Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:49:02.180Z"}
+{"level":"info","message":"✅ Firma de WhatsApp validada correctamente","timestamp":"2025-11-02T19:49:08.978Z"}
+{"level":"warn","message":"⚠️ No se encontró el objeto 'value' en el mensaje","timestamp":"2025-11-02T19:49:08.982Z"}
+{"level":"warn","message":"⚠️ Mensaje no válido recibido","timestamp":"2025-11-02T19:49:08.982Z"}
+{"level":"info","message":"🛑 Señal SIGINT recibida, cerrando servidor...","timestamp":"2025-11-02T19:53:35.822Z"}
+{"level":"warn","message":"⚠️ Channel cerrado","timestamp":"2025-11-02T19:53:35.824Z"}
+{"level":"info","message":"✅ Conectado a RabbitMQ y colas listas","timestamp":"2025-11-02T19:57:13.149Z"}
+{"level":"info","message":"🚀 Webhook escuchando en http://localhost:3000/webhook","timestamp":"2025-11-02T19:57:13.152Z"}
+{"level":"info","message":"🔐 Token de verificación configurado: mi_to...","timestamp":"2025-11-02T19:57:13.152Z"}
+{"level":"info","message":"✅ Firma de WhatsApp validada correctamente","timestamp":"2025-11-02T19:57:28.870Z"}
+{"level":"info","message":"✅ Mensaje enviado a RabbitMQ [object Object]","timestamp":"2025-11-02T19:57:28.872Z"}
+{"level":"info","message":"🛑 Señal SIGINT recibida, cerrando servidor...","timestamp":"2025-11-02T19:57:54.516Z"}
+{"level":"info","message":"🛑 Señal SIGINT recibida, cerrando servidor...","timestamp":"2025-11-02T19:57:54.517Z"}

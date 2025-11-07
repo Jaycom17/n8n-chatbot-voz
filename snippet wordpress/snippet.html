@@ -1,0 +1,788 @@
+<!-- Widget de Contacto WhatsApp + Vapi -->
+<div class="contact-widget">
+  <button class="contact-button" id="contactButton">
+    <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+    </svg>
+  </button>
+
+  <div class="contact-menu" id="contactMenu">
+    <button class="contact-option whatsapp" id="whatsappButton">
+      <svg class="option-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+      </svg>
+      <span>WhatsApp</span>
+    </button>
+    <button class="contact-option vapi" id="vapiButton">
+      <svg class="option-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"></path>
+        <path d="M19 10v1a7 7 0 0 1-14 0v-1"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+      </svg>
+      <span>Llamada de Voz</span>
+    </button>
+  </div>
+
+  <!-- Panel de WhatsApp -->
+  <div class="input-panel whatsapp-panel" id="whatsappPanel">
+    <div class="panel-header">
+      <svg class="panel-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+      </svg>
+      <span>Escribe tu mensaje</span>
+    </div>
+    <textarea 
+      class="panel-textarea" 
+      id="whatsappMessage" 
+      placeholder="Ej: Hola, quiero más información sobre..."
+      rows="3"></textarea>
+    <div class="panel-buttons">
+      <button class="panel-btn panel-btn-primary" id="sendWhatsapp">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        Enviar
+      </button>
+      <button class="panel-btn panel-btn-secondary" id="cancelWhatsapp">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Panel de Vapi -->
+  <div class="input-panel vapi-panel" id="vapiPanel">
+    <div class="panel-header">
+      <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"></path>
+        <path d="M19 10v1a7 7 0 0 1-14 0v-1"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+      </svg>
+      <span>Ingresa tu número</span>
+    </div>
+    <input 
+      type="tel" 
+      class="panel-input" 
+      id="phoneNumber" 
+      placeholder="3001234567"
+      pattern="[0-9\s]+"
+    />
+    <small class="panel-hint">Ejemplo: 3001234567</small>
+    <div class="panel-message" id="vapiMessage"></div>
+    <div class="panel-buttons">
+      <button class="panel-btn panel-btn-primary" id="startCall">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+        </svg>
+        Llamar
+      </button>
+      <button class="panel-btn panel-btn-secondary" id="cancelVapi">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notificación Toast -->
+<div class="toast-notification" id="toastNotification">
+  <div class="toast-content">
+    <svg class="toast-icon" id="toastIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span class="toast-text" id="toastText">Mensaje</span>
+  </div>
+</div>
+
+<style>
+.contact-widget {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 9999;
+}
+
+.contact-button {
+  width: 65px;
+  height: 65px;
+  background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border: none;
+  position: relative;
+}
+
+.contact-button::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%);
+  animation: pulse 2s infinite;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0; }
+}
+
+.contact-button:hover {
+  transform: scale(1.1) rotate(10deg);
+  box-shadow: 0 6px 25px rgba(37, 211, 102, 0.6);
+}
+
+.contact-button.active {
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, #ff4757 0%, #e84118 100%);
+  box-shadow: 0 4px 20px rgba(255, 71, 87, 0.4);
+}
+
+.contact-button.active::before {
+  display: none;
+}
+
+.contact-icon {
+  width: 32px;
+  height: 32px;
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.contact-button.active .contact-icon {
+  transform: rotate(-45deg);
+}
+
+.contact-menu {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.contact-menu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.contact-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 14px 20px;
+  border-radius: 50px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  min-width: 180px;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.contact-option::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  transition: width 0.3s ease;
+}
+
+.contact-option.whatsapp::before {
+  background: linear-gradient(180deg, #25d366 0%, #20ba5a 100%);
+}
+
+.contact-option.vapi::before {
+  background: linear-gradient(180deg, #007bff 0%, #0056b3 100%);
+}
+
+.contact-option:hover {
+  transform: translateX(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.contact-option:hover::before {
+  width: 100%;
+  opacity: 0.1;
+}
+
+.option-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.contact-option.whatsapp .option-icon {
+  color: #25d366;
+}
+
+.contact-option.vapi .option-icon {
+  color: #007bff;
+  stroke: #007bff;
+  fill: none;
+  stroke-width: 2;
+}
+
+.contact-menu.active .contact-option:nth-child(1) {
+  animation: slideIn 0.4s ease forwards;
+  animation-delay: 0.1s;
+}
+
+.contact-menu.active .contact-option:nth-child(2) {
+  animation: slideIn 0.4s ease forwards;
+  animation-delay: 0.2s;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Paneles de Entrada */
+.input-panel {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  min-width: 300px;
+  max-width: 320px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px) scale(0.95);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 9998;
+}
+
+.input-panel.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f3f5;
+}
+
+.panel-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.whatsapp-panel .panel-icon {
+  color: #25d366;
+}
+
+.vapi-panel .panel-icon {
+  color: #007bff;
+}
+
+.panel-header span {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+.panel-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+  min-height: 80px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+
+.panel-textarea:focus {
+  outline: none;
+  border-color: #25d366;
+}
+
+.panel-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: border-color 0.3s ease;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.panel-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.panel-hint {
+  display: block;
+  color: #6c757d;
+  font-size: 12px;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.panel-message {
+  display: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 12px;
+  animation: slideDown 0.3s ease;
+}
+
+.panel-message.show {
+  display: block;
+}
+
+.panel-message.error {
+  background: #fee;
+  color: #c33;
+  border-left: 3px solid #c33;
+}
+
+.panel-message.success {
+  background: #efe;
+  color: #3c3;
+  border-left: 3px solid #3c3;
+}
+
+.panel-message.info {
+  background: #eef;
+  color: #33c;
+  border-left: 3px solid #33c;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.panel-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.panel-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.panel-btn-primary {
+  background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%);
+  color: white;
+  box-shadow: 0 3px 10px rgba(37, 211, 102, 0.3);
+}
+
+.vapi-panel .panel-btn-primary {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+}
+
+.panel-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+}
+
+.vapi-panel .panel-btn-primary:hover {
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+.panel-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.panel-btn-secondary {
+  background: #f1f3f5;
+  color: #333;
+}
+
+.panel-btn-secondary:hover {
+  background: #e9ecef;
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  background: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(400px);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 10000;
+  max-width: 350px;
+}
+
+.toast-notification.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toast-notification.success .toast-icon {
+  color: #25d366;
+}
+
+.toast-notification.error .toast-icon {
+  color: #ff4757;
+}
+
+.toast-notification.info .toast-icon {
+  color: #007bff;
+}
+
+.toast-text {
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .contact-widget {
+    bottom: 20px;
+    right: 20px;
+  }
+  .contact-button {
+    width: 60px;
+    height: 60px;
+  }
+  .contact-icon {
+    width: 28px;
+    height: 28px;
+  }
+  .contact-option {
+    min-width: 160px;
+    padding: 12px 18px;
+    font-size: 14px;
+  }
+  .input-panel {
+    min-width: 280px;
+    max-width: calc(100vw - 60px);
+    right: 10px;
+  }
+  .panel-buttons {
+    flex-direction: column;
+  }
+  .panel-btn {
+    width: 100%;
+  }
+  .toast-notification {
+    right: 20px;
+    max-width: calc(100vw - 40px);
+  }
+}
+</style>
+
+<script>
+(function() {
+  // Configuración - CAMBIA ESTOS VALORES
+  const CONFIG = {
+    whatsappNumber: '15556300258', // Tu número de WhatsApp con código de país
+    n8nWebhookUrl: 'https://n8n.pruebasjaycom.shop/webhook/8c22013e-3726-4001-a3a6-c7c9e6cfeb6d', // URL de tu webhook de n8n
+    n8nApiKey: 'hsfvd38484hvbÑskjbsifvbpairuvbalñidsfvbiwe9' // API Key para Header Authentication
+  };
+
+  // Elementos del DOM
+  const contactButton = document.getElementById('contactButton');
+  const contactMenu = document.getElementById('contactMenu');
+  const whatsappButton = document.getElementById('whatsappButton');
+  const vapiButton = document.getElementById('vapiButton');
+  const whatsappPanel = document.getElementById('whatsappPanel');
+  const vapiPanel = document.getElementById('vapiPanel');
+  const whatsappMessage = document.getElementById('whatsappMessage');
+  const phoneNumber = document.getElementById('phoneNumber');
+  const sendWhatsapp = document.getElementById('sendWhatsapp');
+  const cancelWhatsapp = document.getElementById('cancelWhatsapp');
+  const startCall = document.getElementById('startCall');
+  const cancelVapi = document.getElementById('cancelVapi');
+  const vapiMessage = document.getElementById('vapiMessage');
+  const toastNotification = document.getElementById('toastNotification');
+  const toastText = document.getElementById('toastText');
+  const toastIcon = document.getElementById('toastIcon');
+
+  // Función para mostrar notificación toast
+  function showToast(message, type = 'success') {
+    toastText.textContent = message;
+    toastNotification.className = `toast-notification ${type}`;
+    
+    // Cambiar el icono según el tipo
+    if (type === 'success') {
+      toastIcon.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>';
+    } else if (type === 'error') {
+      toastIcon.innerHTML = '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>';
+    } else if (type === 'info') {
+      toastIcon.innerHTML = '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>';
+    }
+    
+    toastNotification.classList.add('show');
+    
+    setTimeout(() => {
+      toastNotification.classList.remove('show');
+    }, 3500);
+  }
+
+  // Función para mostrar mensaje en panel
+  function showPanelMessage(element, message, type = 'error') {
+    element.textContent = message;
+    element.className = `panel-message ${type} show`;
+    
+    setTimeout(() => {
+      element.classList.remove('show');
+    }, 4000);
+  }
+
+  // Toggle menú principal
+  contactButton.addEventListener('click', () => {
+    contactButton.classList.toggle('active');
+    contactMenu.classList.toggle('active');
+    
+    // Cerrar paneles si están abiertos
+    whatsappPanel.classList.remove('active');
+    vapiPanel.classList.remove('active');
+  });
+
+  // Cerrar menú al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.contact-widget')) {
+      contactButton.classList.remove('active');
+      contactMenu.classList.remove('active');
+      whatsappPanel.classList.remove('active');
+      vapiPanel.classList.remove('active');
+    }
+  });
+
+  // Abrir panel de WhatsApp
+  whatsappButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    contactMenu.classList.remove('active');
+    vapiPanel.classList.remove('active');
+    whatsappPanel.classList.add('active');
+    whatsappMessage.focus();
+  });
+
+  // Abrir panel de Vapi
+  vapiButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    contactMenu.classList.remove('active');
+    whatsappPanel.classList.remove('active');
+    vapiPanel.classList.add('active');
+    phoneNumber.focus();
+  });
+
+  // Enviar mensaje de WhatsApp
+  sendWhatsapp.addEventListener('click', () => {
+    const message = whatsappMessage.value.trim();
+    
+    if (!message) {
+      whatsappMessage.focus();
+      whatsappMessage.style.borderColor = '#ff4757';
+      setTimeout(() => {
+        whatsappMessage.style.borderColor = '#e9ecef';
+      }, 2000);
+      return;
+    }
+
+    // Construir URL de WhatsApp
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodedMessage}`;
+    
+    // Abrir WhatsApp
+    window.open(whatsappUrl, '_blank');
+    
+    // Limpiar y cerrar
+    whatsappMessage.value = '';
+    whatsappPanel.classList.remove('active');
+    contactButton.classList.remove('active');
+  });
+
+  // Cancelar WhatsApp
+  cancelWhatsapp.addEventListener('click', () => {
+    whatsappPanel.classList.remove('active');
+    whatsappMessage.value = '';
+  });
+
+  // Iniciar llamada con Vapi
+  startCall.addEventListener('click', async () => {
+    const phone = phoneNumber.value.trim();
+    
+    // Validar número de teléfono
+    if (!phone) {
+      phoneNumber.focus();
+      phoneNumber.style.borderColor = '#ff4757';
+      showPanelMessage(vapiMessage, 'Por favor ingresa tu número de teléfono', 'error');
+      setTimeout(() => {
+        phoneNumber.style.borderColor = '#e9ecef';
+      }, 2000);
+      return;
+    }
+
+    // Validar formato básico (números, espacios y +)
+    const phoneRegex = /^[+]?[0-9\s]+$/;
+    if (!phoneRegex.test(phone)) {
+      phoneNumber.focus();
+      phoneNumber.style.borderColor = '#ff4757';
+      showPanelMessage(vapiMessage, 'Formato de número inválido. Usa solo números, espacios y +', 'error');
+      setTimeout(() => {
+        phoneNumber.style.borderColor = '#e9ecef';
+      }, 2000);
+      return;
+    }
+
+    // Remover espacios del número
+    const cleanPhone = phone.replace(/\s/g, '');
+
+    try {
+      startCall.disabled = true;
+      startCall.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg> Conectando...';
+      
+      showPanelMessage(vapiMessage, 'Iniciando llamada...', 'info');
+      
+      // Llamar al webhook de n8n con X-API-Key
+      console.log('Iniciando llamada con Vapi a:', cleanPhone);
+      console.log('URL del webhook:', CONFIG.n8nWebhookUrl);
+      
+      const response = await fetch(CONFIG.n8nWebhookUrl, {
+        method: 'POST',
+        headers: {
+          'X-API-Key': CONFIG.n8nApiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          phone: cleanPhone
+        })
+      });
+
+      console.log('Status de respuesta:', response.status);
+
+      if (!response.ok) {
+        // Intentar leer el cuerpo de la respuesta para más detalles
+        let errorDetails = '';
+        try {
+          const errorText = await response.text();
+          errorDetails = errorText;
+          console.error('Detalles del error:', errorText);
+        } catch (e) {
+          console.error('No se pudo leer el error:', e);
+        }
+        
+        throw new Error(`Error ${response.status}: No se pudo conectar`);
+      }
+
+      const data = await response.json();
+      console.log('Respuesta del webhook:', data);
+      
+      // Mostrar notificación de éxito
+      showToast(`¡Llamada iniciada exitosamente!`, 'success');
+      
+      // Limpiar y cerrar después de 2 segundos
+      setTimeout(() => {
+        phoneNumber.value = '';
+        vapiPanel.classList.remove('active');
+        contactButton.classList.remove('active');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error al iniciar llamada:', error);
+      showPanelMessage(vapiMessage, 'Error al conectar. Por favor intenta de nuevo', 'error');
+    } finally {
+      startCall.disabled = false;
+      startCall.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Llamar';
+    }
+  });
+
+  // Cancelar Vapi
+  cancelVapi.addEventListener('click', () => {
+    vapiPanel.classList.remove('active');
+    phoneNumber.value = '';
+  });
+
+  // Permitir Enter para enviar
+  whatsappMessage.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendWhatsapp.click();
+    }
+  });
+
+  phoneNumber.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      startCall.click();
+    }
+  });
+})();
+</script>

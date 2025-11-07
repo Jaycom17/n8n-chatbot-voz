@@ -1,3 +1,10 @@
 {"error":"Connection closed (Error: Connection closed: 320 (CONNECTION-FORCED) with message \"CONNECTION_FORCED - broker forced connection closure with reason 'shutdown'\")","level":"error","message":"❌ Error cerrando conexiones","timestamp":"2025-10-24T18:02:19.046Z"}
 {"error":"Connection closed (Error: Connection closed: 320 (CONNECTION-FORCED) with message \"CONNECTION_FORCED - broker forced connection closure with reason 'shutdown'\")","level":"error","message":"❌ Error cerrando conexiones","timestamp":"2025-10-26T23:22:51.945Z"}
 {"error":"connect ECONNREFUSED 127.0.0.1:5672","level":"error","message":"❌ Error conectando a RabbitMQ, reintentando en 5s...","timestamp":"2025-11-02T17:18:32.952Z"}
+{"error":"read ECONNRESET","level":"error","message":"❌ Error conectando a RabbitMQ, reintentando en 5s...","timestamp":"2025-11-02T19:22:12.615Z"}
+{"level":"error","message":"❌ ERROR DE CONFIGURACIÓN: WHATSAPP_APP_SECRET no está configurado","timestamp":"2025-11-02T19:22:39.323Z"}
+{"error":"Channel closing","level":"error","message":"❌ Error cerrando conexiones","timestamp":"2025-11-02T19:24:41.834Z"}
+{"level":"error","message":"❌ ERROR DE CONFIGURACIÓN: WHATSAPP_APP_SECRET no está configurado","timestamp":"2025-11-02T19:24:48.578Z"}
+{"level":"error","message":"❌ ERROR DE CONFIGURACIÓN: WHATSAPP_APP_SECRET no está configurado","timestamp":"2025-11-02T19:25:34.656Z"}
+{"error":"Channel closing","level":"error","message":"❌ Error cerrando conexiones","timestamp":"2025-11-02T19:27:55.206Z"}
+{"error":"Channel closing","level":"error","message":"❌ Error cerrando conexiones","timestamp":"2025-11-02T19:57:54.518Z"}

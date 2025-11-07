@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log
+.env
+.git
+.gitignore
+*.md
+*.log
+combined.log
+error.log
+ARQUITECTURA.md
+CHANGELOG.md
+CHECKLIST_DEPLOY.md
+DIAGRAMA_FLUJO.md
+README.md
+RESUMEN_IMPLEMENTACION.md
+RESUMEN_SEGURIDAD.md
+SEGURIDAD.md

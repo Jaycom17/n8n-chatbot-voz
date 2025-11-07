@@ -33,6 +33,7 @@ export async function verifyWebhook(req, res) {
  */
 export async function receiveWebhook(req, res) {
   try {
+
     const parsedMessage = parseWhatsAppMessage(req.body);
 
     if (!parsedMessage) {

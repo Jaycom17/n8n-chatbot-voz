@@ -1,32 +1,17 @@
 /**
  * Middleware para capturar el raw body
  * Necesario para la validación de firma de WhatsApp
+ * 
+ * Este middleware usa la función verify de express.json()
+ * para capturar el raw body ANTES de que sea parseado
  */
-import { logger } from "../utils/logger.js";
 
 /**
- * Captura el raw body antes de que sea parseado
- * Lo guarda en req.rawBody para usarlo en la validación de firma
+ * Función verify para express.json() que captura el raw body
+ * Se ejecuta antes del parsing, guardando el buffer original
  */
-export function captureRawBody(req, res, next) {
-  // Solo capturar para peticiones POST/PUT/PATCH
-  if (["POST", "PUT", "PATCH"].includes(req.method)) {
-    let data = "";
-
-    req.on("data", (chunk) => {
-      data += chunk.toString();
-    });
-
-    req.on("end", () => {
-      req.rawBody = data;
-      next();
-    });
-
-    req.on("error", (err) => {
-      logger.error("❌ Error capturando raw body", { error: err.message });
-      next(err);
-    });
-  } else {
-    next();
+export function captureRawBodyVerify(req, res, buf, encoding) {
+  if (buf && buf.length) {
+    req.rawBody = buf.toString(encoding || 'utf8');
   }
 }
