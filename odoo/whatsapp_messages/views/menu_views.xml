@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menú principal -->
+    <menuitem id="menu_whatsapp_root"
+              name="Chatbot WhatsApp"
+              sequence="100"/>
+    
+    <!-- Submenú: Etapas de Conversación -->
+    <menuitem id="menu_conversation_stages"
+              name="Etapas de Conversación"
+              parent="menu_whatsapp_root"
+              action="action_conversation_stage"
+              sequence="10"/>
+    
+    <!-- Submenú: Mensajes -->
+    <menuitem id="menu_whatsapp_messages"
+              name="Mensajes"
+              parent="menu_whatsapp_root"
+              action="action_whatsapp_message_template"
+              sequence="20"/>
+</odoo>
