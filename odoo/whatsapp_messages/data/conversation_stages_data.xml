@@ -5,35 +5,30 @@
         
         <record id="stage_bienvenida" model="conversation.stage">
             <field name="name">Bienvenida Inicial</field>
-            <field name="code">bienvenida</field>
             <field name="sequence">10</field>
             <field name="description">Primer mensaje cuando el usuario contacta</field>
         </record>
 
         <record id="stage_presentacion_servicios" model="conversation.stage">
             <field name="name">Presentación de Servicios</field>
-            <field name="code">presentacion_servicios</field>
             <field name="sequence">20</field>
             <field name="description">Cuando se presenta el catálogo de servicios/productos</field>
         </record>
 
         <record id="stage_detalle_producto" model="conversation.stage">
             <field name="name">Detalle de Producto</field>
-            <field name="code">detalle_producto</field>
             <field name="sequence">30</field>
             <field name="description">Información detallada de un producto/servicio específico</field>
         </record>
 
         <record id="stage_precios" model="conversation.stage">
             <field name="name">Información de Precios</field>
-            <field name="code">precios</field>
             <field name="sequence">40</field>
             <field name="description">Cuando se consultan precios</field>
         </record>
 
         <record id="stage_cierre" model="conversation.stage">
             <field name="name">Cierre/Siguiente Paso</field>
-            <field name="code">cierre</field>
             <field name="sequence">50</field>
             <field name="description">Mensaje de cierre o llamado a la acción</field>
         </record>
