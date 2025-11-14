@@ -37,12 +37,5 @@
             <field name="sequence">50</field>
             <field name="description">Mensaje de cierre o llamado a la acción</field>
         </record>
-
-        <record id="stage_seguimiento" model="conversation.stage">
-            <field name="name">Seguimiento</field>
-            <field name="code">seguimiento</field>
-            <field name="sequence">60</field>
-            <field name="description">Mensajes de seguimiento posterior</field>
-        </record>
     </data>
 </odoo>

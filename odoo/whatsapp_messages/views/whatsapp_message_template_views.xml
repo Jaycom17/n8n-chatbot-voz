@@ -25,11 +25,8 @@
                     </group>
                     <group>
                         <label for="message" string="Mensaje"/>
-                        <div class="text-muted">
-                            Variables disponibles: {nombre}, {email}, {telefono}, {empresa}
-                        </div>
                         <field name="message" widget="text" nolabel="1" 
-                               placeholder="Ejemplo:&#10;Hola {nombre}, gracias por tu interés en nuestros cursos.&#10;&#10;Tenemos las siguientes opciones:&#10;- Curso A: $100&#10;- Curso B: $200&#10;&#10;¿Cuál te interesa?"/>
+                               placeholder="Ejemplo:&#10;Hola, gracias por tu interés en nuestros cursos.&#10;&#10;Tenemos las siguientes opciones:&#10;- Curso A: $100&#10;- Curso B: $200&#10;&#10;¿Cuál te interesa?"/>
                     </group>
                     <group>
                         <field name="notes" placeholder="Notas internas sobre cuándo usar este mensaje"/>

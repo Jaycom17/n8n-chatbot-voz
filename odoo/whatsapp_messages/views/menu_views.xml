@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Acción para conversaciones (default) -->
+    <record id="action_conversation_stage" model="ir.actions.act_window">
+        <field name="name">Etapas de Conversación</field>
+        <field name="res_model">conversation.stage</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_whatsapp_message_template" model="ir.actions.act_window">
+        <field name="name">Mensajes por Conversación</field>
+        <field name="res_model">whatsapp.message.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+
     <!-- Menú principal -->
     <menuitem id="menu_whatsapp_root"
               name="Chatbot WhatsApp"
+              action="action_conversation_stage"
               sequence="100"/>
     
     <!-- Submenú: Etapas de Conversación -->
