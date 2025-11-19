@@ -185,8 +185,11 @@ function voice_chatbot_generate_jwt() {
 // ============================================
 
 add_action('wp_enqueue_scripts', function() {
-  wp_enqueue_style('voice-chatbot-style', plugin_dir_url(__FILE__) . 'style.css');
-  wp_enqueue_script('voice-chatbot-js', plugin_dir_url(__FILE__) . 'voice-chatbot.js', [], '2.0', true);
+  // Usar timestamp para forzar recarga en cada cambio (desactivar cache)
+  $version = time(); // Esto fuerza recarga cada vez
+  
+  wp_enqueue_style('voice-chatbot-style', plugin_dir_url(__FILE__) . 'style.css', [], $version);
+  wp_enqueue_script('voice-chatbot-js', plugin_dir_url(__FILE__) . 'voice-chatbot.js', [], $version, true);
 
   // Obtener configuración desde la base de datos
   $webhook_url = get_option('voice_chatbot_webhook_url', '');

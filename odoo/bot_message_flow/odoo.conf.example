@@ -1,0 +1,23 @@
+# Configuración de ejemplo para odoo.conf
+
+# Ruta de addons personalizados (incluye el bot_message_flow)
+addons_path = /ruta/a/odoo/addons,/ruta/a/custom-addons
+
+# Base de datos
+db_host = localhost
+db_port = 5432
+db_user = odoo
+db_password = odoo
+db_name = odoo
+
+# Puerto de Odoo
+http_port = 8069
+
+# Permite cargar módulos en modo debug
+--dev=all
+
+# Log level
+log_level = info
+
+# Limit request size
+limit_request_size = 8388608

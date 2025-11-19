@@ -27,6 +27,7 @@
   let analyser = null;
   let silenceDetectionActive = false;
   let callActive = false;
+  let speakingLogged = false; // Flag para evitar spam de logs
   
   const SILENCE_THRESHOLD = 0.01;
   const SILENCE_DURATION = 1500;
@@ -96,9 +97,6 @@
       // Generar ID unico: timestamp + random
       sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
       localStorage.setItem('voiceChatbotSessionId', sessionId);
-      console.log('Nuevo session ID creado:', sessionId);
-    } else {
-      console.log('Session ID existente:', sessionId);
     }
     
     return sessionId;
@@ -145,7 +143,6 @@
     voiceBtn.disabled = true;
     voiceBtn.style.opacity = '0.5';
     voiceBtn.style.cursor = 'not-allowed';
-    console.error('Voice Chatbot: No configurado');
     return;
   }
 
@@ -162,8 +159,6 @@
   voiceBtn.addEventListener('click', handleButtonClick);
 
   function handleButtonClick() {
-    console.log('Boton clickeado. Estado actual:', currentState, 'Llamada activa:', callActive);
-    
     if (!callActive) {
       // Iniciar llamada
       initContinuousListening();
@@ -178,8 +173,6 @@
   // ============================================
   
   async function initContinuousListening() {
-    console.log('Iniciando modo escucha continua...');
-    
     try {
       stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
@@ -190,7 +183,6 @@
         } 
       });
       
-      console.log('Microfono activado');
       callActive = true;
       startCallTimer();
       setupVoiceDetection();
@@ -204,7 +196,6 @@
       if (phoneIcon) phoneIcon.style.display = 'block';
       
     } catch (error) {
-      console.error('Error al acceder al microfono:', error);
       updateStatus('Error de microfono', 'Permite el acceso al microfono');
       
       if (error.name === 'NotAllowedError') {
@@ -220,8 +211,6 @@
   // ============================================
   
   function setupVoiceDetection() {
-    console.log('Configurando deteccion de voz...');
-    
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     analyser = audioContext.createAnalyser();
     const source = audioContext.createMediaStreamSource(stream);
@@ -245,10 +234,17 @@
       }
       const volume = Math.sqrt(sum / bufferLength);
       
+      // Marcar flag cuando entra en SPEAKING
+      if (currentState === STATE.SPEAKING && !speakingLogged) {
+        speakingLogged = true;
+      }
+      
+      // Detectar voz en estado READY para iniciar grabacion
       if (currentState === STATE.READY && volume > SILENCE_THRESHOLD) {
         startRecording();
       }
       
+      // Detectar silencio durante la grabacion
       if (currentState === STATE.LISTENING) {
         if (volume < SILENCE_THRESHOLD) {
           if (!silenceTimeout) {
@@ -264,6 +260,18 @@
         }
       }
       
+      // Detectar voz durante reproduccion para interrumpir
+      if (currentState === STATE.SPEAKING && volume > SILENCE_THRESHOLD) {
+        stopSpeaking();
+        speakingLogged = false;
+        // Dar un pequeño delay para que se estabilice antes de empezar a grabar
+        setTimeout(function() {
+          if (currentState === STATE.READY) {
+            startRecording();
+          }
+        }, 300);
+      }
+      
       requestAnimationFrame(detectVoice);
     }
     
@@ -277,7 +285,6 @@
   function startRecording() {
     if (!stream || currentState !== STATE.READY) return;
     
-    console.log('Iniciando grabacion...');
     audioChunks = [];
     
     try {
@@ -300,15 +307,12 @@
       updateStatus('Escuchando...', 'Habla con naturalidad');
       
     } catch (error) {
-      console.error('Error al grabar:', error);
       setState(STATE.READY);
       updateStatus('Error', error.message);
     }
   }
 
   function stopRecording() {
-    console.log('Deteniendo grabacion...');
-    
     if (silenceTimeout) {
       clearTimeout(silenceTimeout);
       silenceTimeout = null;
@@ -324,8 +328,6 @@
   // ============================================
   
   async function processRecording() {
-    console.log('Procesando audio...');
-    
     if (audioChunks.length === 0) {
       setState(STATE.READY);
       updateStatus('Llamada activa', 'Esperando que hables...');
@@ -333,7 +335,6 @@
     }
 
     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-    console.log('Audio blob creado:', audioBlob.size, 'bytes');
     
     setState(STATE.PROCESSING);
     updateStatus('Procesando...', 'Analizando tu mensaje...');
@@ -341,16 +342,12 @@
     try {
       await sendAudioToWebhook(audioBlob);
     } catch (error) {
-      console.error('Error:', error);
       setState(STATE.READY);
       updateStatus('Llamada activa', 'Esperando que hables...');
     }
   }
 
   async function sendAudioToWebhook(audioBlob) {
-    console.log('Enviando a webhook:', voiceChatbotConfig.webhookUrl);
-    console.log('Session ID:', SESSION_ID);
-    
     const formData = new FormData();
     formData.append('audio', audioBlob, 'audio.webm');
     formData.append('session_id', SESSION_ID);
@@ -363,14 +360,11 @@
       body: formData
     });
 
-    console.log('Respuesta del servidor:', response.status);
-
     if (!response.ok) {
       throw new Error('Error del servidor: ' + response.status);
     }
 
     const responseBlob = await response.blob();
-    console.log('Audio recibido:', responseBlob.size, 'bytes');
     
     if (!responseBlob || responseBlob.size === 0) {
       throw new Error('No se recibio audio del servidor');
@@ -385,23 +379,40 @@
   // ============================================
   
   async function playBotResponse(audioBlobUrl) {
-    console.log('Reproduciendo respuesta...');
-    
     audioElement.src = audioBlobUrl;
     audioElement.load();
 
-    await new Promise(function(resolve, reject) {
-      audioElement.oncanplaythrough = resolve;
-      audioElement.onerror = function() {
-        reject(new Error('Error al cargar el audio'));
-      };
-    });
+    try {
+      await new Promise(function(resolve, reject) {
+        // Timeout de 5 segundos
+        const timeout = setTimeout(function() {
+          reject(new Error('Timeout esperando audio'));
+        }, 5000);
+        
+        audioElement.oncanplaythrough = function() {
+          clearTimeout(timeout);
+          resolve();
+        };
+        
+        audioElement.onerror = function(e) {
+          clearTimeout(timeout);
+          reject(new Error('Error al cargar el audio'));
+        };
+      });
+    } catch (error) {
+      finishSpeaking();
+      return;
+    }
 
     setState(STATE.SPEAKING);
     updateStatus('Asistente hablando...', 'Puedes interrumpir hablando');
 
-    await audioElement.play();
+    // NO usar await para permitir que detectVoice() continue ejecutandose
+    audioElement.play().catch(function(error) {
+      finishSpeaking();
+    });
 
+    // Configurar evento onended
     audioElement.onended = function() {
       if (currentState === STATE.SPEAKING) {
         finishSpeaking();
@@ -410,8 +421,6 @@
   }
 
   function stopSpeaking() {
-    console.log('Interrumpiendo respuesta...');
-    
     if (audioElement) {
       audioElement.pause();
       audioElement.currentTime = 0;
@@ -421,6 +430,7 @@
   }
 
   function finishSpeaking() {
+    speakingLogged = false; // Reset flag para el proximo ciclo
     setState(STATE.READY);
     updateStatus('Escuchando...', 'Presiona de nuevo para colgar');
   }
@@ -430,8 +440,6 @@
   // ============================================
   
   function hangUpCall() {
-    console.log('Colgando llamada...');
-    
     // Detener deteccion de voz
     silenceDetectionActive = false;
     
@@ -483,15 +491,12 @@
     
     updateStatus('Llamada finalizada', 'Presiona para llamar de nuevo');
     updateButtonLabel('Llamar');
-    
-    console.log('Llamada finalizada');
   }
 
   // ============================================
   // Inicializacion
   // ============================================
   
-  console.log('Voice Chatbot inicializado');
   updateStatus('Presiona para llamar', 'Llamada de voz con IA');
   updateButtonLabel('Llamar');
 

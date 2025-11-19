@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menú raíz dentro de CRM -->
+    <menuitem
+        id="menu_bot_root"
+        name="Configuración del Bot"
+        parent="crm.crm_menu_config"
+        sequence="100"/>
+
+    <!-- Menú de Mensajes del Bot -->
+    <menuitem
+        id="menu_bot_stage_message"
+        name="Mensajes del Bot"
+        parent="menu_bot_root"
+        action="action_bot_stage_message"
+        sequence="10"/>
+
+    <!-- Vista tipo árbol (lista) -->
+    <record id="view_bot_stage_message_tree" model="ir.ui.view">
+        <field name="name">bot.stage.message.tree</field>
+        <field name="model">bot.stage.message</field>
+        <field name="arch" type="xml">
+            <tree string="Mensajes del Bot" decoration-muted="not active">
+                <field name="name"/>
+                <field name="next_stage_id"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista tipo formulario -->
+    <record id="view_bot_stage_message_form" model="ir.ui.view">
+        <field name="name">bot.stage.message.form</field>
+        <field name="model">bot.stage.message</field>
+        <field name="arch" type="xml">
+            <form string="Mensaje del Bot">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="next_stage_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <label for="message" string="Mensaje a enviar"/>
+                        <field name="message" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista tipo búsqueda (filtros) -->
+    <record id="view_bot_stage_message_search" model="ir.ui.view">
+        <field name="name">bot.stage.message.search</field>
+        <field name="model">bot.stage.message</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Mensajes del Bot">
+                <field name="name" string="Nombre de la Etapa"/>
+                <field name="message" string="Mensaje"/>
+                <separator/>
+                <filter name="filter_active" string="Activo" domain="[('active', '=', True)]"/>
+                <filter name="filter_inactive" string="Inactivo" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción para abrir la vista -->
+    <record id="action_bot_stage_message" model="ir.actions.act_window">
+        <field name="name">Mensajes del Bot</field>
+        <field name="res_model">bot.stage.message</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea un nuevo mensaje del bot
+            </p>
+            <p>
+                Define las etapas y mensajes que enviará el bot del chatbot de voz.
+            </p>
+        </field>
+    </record>
+</odoo>
