@@ -27,13 +27,10 @@ services:
       - LETSENCRYPT_HOST=${API_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - VIRTUAL_PORT=3000
-    
+    ports:
+      - "3000:3000"
     expose:
       - "3000"
-    
-    networks:
-      - proxy-tier
-      - rabbitmq_network
     
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/webhook"]
@@ -47,9 +44,3 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-networks:
-  proxy-tier:
-    external: true
-  rabbitmq_network:
-    external: true

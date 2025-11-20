@@ -74,7 +74,10 @@ services:
       - LETSENCRYPT_HOST=${ODOO_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - VIRTUAL_PORT=8069
-    command: ["odoo", "--db_host=postgres-odoo", "--db_port=5432", "--db_user=${ODOO_DB_USER}", "--db_password=${ODOO_DB_PASSWORD}", "-d", "odoo", "-i", "base", "--without-demo=all"]
+      - LANG=es_ES.UTF-8
+      - LANGUAGE=es_ES:es
+      - LC_ALL=es_ES.UTF-8
+    command: ["odoo", "--db_host=postgres-odoo", "--db_port=5432", "--db_user=${ODOO_DB_USER}", "--db_password=${ODOO_DB_PASSWORD}", "-d", "odoo", "-i", "base", "--without-demo=all", "--load-language=es_ES"]
     ports:
       - "8069:8069"
     volumes:

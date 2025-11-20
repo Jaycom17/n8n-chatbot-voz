@@ -3,7 +3,7 @@
  * Todas las variables de entorno y constantes se definen aquí
  */
 // Cargar variables de entorno desde .env
-const fs = require('fs');
+import fs from 'fs';
 if (fs.existsSync('.env')) {
   require('dotenv').config();
   console.log('📄 Dotenv: Cargando desde archivo .env');
