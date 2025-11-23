@@ -1,9 +1,10 @@
 version: "3.8"
-
+#Este es el que se debe usar en produccion
 services:
   postgres-vector:
     image: ankane/pgvector
     container_name: postgres-vector
+    restart: always
     env_file:
       - .env
     environment:
@@ -18,11 +19,12 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - odoo-n8n-network
+      - proxy-tier
 
   postgres-odoo:
     image: postgres:17
     container_name: postgres-odoo
+    restart: always
     env_file:
       - .env
     environment:
@@ -37,11 +39,12 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - odoo-n8n-network
+      - proxy-tier
 
   n8n:
     image: n8nio/n8n:1.117.1
     container_name: n8n
+    restart: always
     depends_on:
       postgres-vector:
         condition: service_healthy
@@ -58,23 +61,26 @@ services:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=${N8N_USER}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - WEBHOOK_URL=https://${N8N_DOMAIN}/
+      - VIRTUAL_HOST=${N8N_DOMAIN}
+      - LETSENCRYPT_HOST=${N8N_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_RUNNERS_ENABLED=true
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       - N8N_GIT_NODE_DISABLE_BARE_REPOS=true
     user: "1000:1000"
-    ports:
-      - "5678:5678"
     volumes:
       - n8n-data:/home/node/.n8n
     expose:
       - "5678"
     networks:
-      - odoo-n8n-network
+      - proxy-tier
 
   odoo:
     image: odoo:18
     container_name: odoo
+    restart: always
     depends_on:
       postgres-odoo:
         condition: service_healthy
@@ -88,26 +94,22 @@ services:
       - LETSENCRYPT_HOST=${ODOO_DOMAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - VIRTUAL_PORT=8069
-      - LANG=es_ES.UTF-8
-      - LANGUAGE=es_ES:es
-      - LC_ALL=es_ES.UTF-8
     command: ["odoo", "--db_host=postgres-odoo", "--db_port=5432", "--db_user=${ODOO_DB_USER}", "--db_password=${ODOO_DB_PASSWORD}", "-d", "odoo", "-i", "base", "--without-demo=all", "--load-language=es_ES"]
-    ports:
-      - "8069:8069"
     volumes:
       - odoo-data:/var/lib/odoo
-      - ./addons:/mnt/extra-addons
+      - odoo-addons:/mnt/extra-addons
     expose:
       - "8069"
     networks:
-      - odoo-n8n-network
-
-networks:
-  odoo-n8n-network:
-    driver: bridge
+      - proxy-tier
 
 volumes:
   postgres-vector-data:
   postgres-odoo-data:
   n8n-data:
   odoo-data:
+  odoo-addons:
+
+networks:
+  proxy-tier:
+    external: true
